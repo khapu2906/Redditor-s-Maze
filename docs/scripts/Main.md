@@ -1,6 +1,4 @@
-Here is the complete, polished version of the **Redditor's Maze** game rules and scoring system in English:
 
----
 
 # **Redditor's Maze - Game Rules**
 
