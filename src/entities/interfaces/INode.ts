@@ -6,6 +6,7 @@ interface INode {
 	isFinal: boolean
 	getNextNodes(): Array<INode>
 	addNextNode(node: INode): void
+	clearNextNodes(): void;
 }
 
 export default INode;

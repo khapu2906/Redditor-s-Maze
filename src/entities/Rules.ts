@@ -3,8 +3,8 @@ import IRule from "./interfaces/IRule"
 import { Level, DownLevelPoint, DownLevelWithTimeRate } from "./enums/Level"
 import { DownTimePointKey } from "./enums/Point"
 
-const MAX_COMPLETED_POINT_MAZE  = 200;
-const MAX_COMPLETED_POINT_NODE  = 70;
+const MAX_COMPLETED_POINT_MAZE  = 400;
+const MAX_COMPLETED_POINT_NODE  = 100;
 const MAX_COMPLETED_POINT_QUICK = 50;
 
 
@@ -20,8 +20,14 @@ class Rule implements IRule {
 
 	constructor(
 		public level: Level
-	) {
-		this.maxCompletedPoint -= DownLevelPoint[level]
+	) {}
+
+	protected setMaxCompletedPoint() {
+		this.maxCompletedPoint += DownLevelPoint[this.level]
+	}
+
+	public clearMaxCompletedPoint() {
+		this.maxCompletedPoint = 0;
 	}
 
 	public calculatePointWithTime(completedTime: number): void {
@@ -41,17 +47,40 @@ class Rule implements IRule {
 		const downTimePointRateWithLevel: number = DownLevelWithTimeRate[this.level]
 
 		this.maxCompletedPoint -= downTimePoint * downTimePointRateWithLevel;
+		this.maxCompletedPoint = this.maxCompletedPoint > 0 ? this.maxCompletedPoint : 0;
 	}
 }
 
 export class RuleMaze extends Rule {
 	public override maxCompletedPoint: number = MAX_COMPLETED_POINT_MAZE;
+
+	constructor(
+		level: Level
+	) {
+		super(level);
+		this.setMaxCompletedPoint()
+	}
 }
 
 export class RuleNode extends Rule {
+
 	public override maxCompletedPoint: number = MAX_COMPLETED_POINT_NODE;
+
+	constructor(
+		level: Level
+	) {
+		super(level);
+		this.setMaxCompletedPoint()
+	}
 }
 
 export class RuleQuick extends Rule {
 	public override maxCompletedPoint: number = MAX_COMPLETED_POINT_QUICK;
+
+	constructor(
+		level: Level
+	) {
+		super(level);
+		this.setMaxCompletedPoint()
+	}
 }

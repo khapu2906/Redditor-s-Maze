@@ -1,5 +1,5 @@
 import INode from "./interfaces/INode";
-import IQuick from "./interfaces/IQuick";
+import { IQuick } from "./interfaces/IQuick";
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
@@ -13,6 +13,8 @@ class Node implements INode {
 	private rule: IRule;
 	private nextNodes: Array<INode> = []
 	private state: State = State.NOT_YET;
+	private startTime: Date | null = null;
+	private endTime: Date | null = null;
 
 	public isFinal: boolean = false
 
@@ -32,12 +34,29 @@ class Node implements INode {
 		return this.nextNodes
 	}
 
+	clearNextNodes(): void {
+		this.nextNodes = [];
+	}
+
 	stateWorking() {
 		this.state = State.WORKING
 	}
 
-	stateDone(completedTime: number) {
+	start() {
+		this.startTime = new Date()
+		this.stateWorking()
+	}
+
+	end() {
+		if (!this.startTime) {
+			throw new Error("Node has not been started yet. Call start() before stateDone().");
+		}
+		if (this.endTime) {
+			throw new Error("Node end");
+		}
 		this.state = State.DONE
+		this.endTime = new Date();
+		const completedTime = this.endTime.getTime() - this.startTime.getTime() / 1000;
 		this._calculatePoint(completedTime)
 	}
 

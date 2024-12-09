@@ -11,12 +11,13 @@ import { State } from "./enums/State";
 
 class Maze implements IMaze {
 	private rule: IRule;
-	// private finalNode: INode | null;
 	public completedPoint: number = 0;
 	private state: State = State.NOT_YET;
+	private startTime: Date | null = null;
+	private endTime: Date | null = null;
 
 	constructor(
-		private keywords: Array<String>,
+		private keywords: Array<string>,
 		private level: Level,
 		private nodes: Array<INode>
 	) {
@@ -25,6 +26,12 @@ class Maze implements IMaze {
 		if (this.nodes.length !== LevelMaxNode[this.level]) {
 			throw new Error("Amount of Node invalid")
 		}
+	}
+
+	start() {
+		this.startTime = new Date()
+		this.bumpUp()
+		this.state = State.WORKING;
 	}
 
 	getKeyWords() {
@@ -46,16 +53,23 @@ class Maze implements IMaze {
 				const randomCount = Math.max(2, Math.floor(Math.random() * others.length));
 				const next = shuffled.slice(0, randomCount);
 
-				root.getNextNodes().length = 0;
+				root.clearNextNodes();
 				next.forEach(node => root.addNextNode(node));
 			}
 		});
 	}
 
-
-	public stateDone(completedTime: number) {
-		this.state = State.DONE
-		this._calculatePoint(completedTime)
+	public end() {
+		if (!this.startTime) {
+			throw new Error("Maze has not been started yet. Call start() before stateDone().");
+		}
+		if (this.endTime) {
+			throw new Error("Maze end");
+		}
+		this.state = State.DONE;
+		this.endTime = new Date();
+		const completedTime = this.endTime.getTime() - this.startTime.getTime() / 1000;
+		this._calculatePoint(completedTime);
 	}
 
 	private _calculatePoint(completedTime: number): void {
