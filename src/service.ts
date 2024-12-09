@@ -38,11 +38,10 @@ const redditUsernames: Array<string> = [
 	"TurboKoala999"
 ];
 
-
 export class Service {
 	constructor(private context: any) {}
 
-	async startMaze(kw: string, level: Level) {
+	async startMaze(kw: string, level: Level): IMaze {
 		// start maze
 		const maze = new Maze(kw, level)
 		const posts: Array<any> = await this.context.reddit.getHotPosts({
