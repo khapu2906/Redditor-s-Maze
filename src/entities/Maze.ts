@@ -21,7 +21,7 @@ class Maze implements IMaze {
 	private nodes: Array<INode> = []
 
 	constructor(
-		private keywords: Array<string>,
+		private keywords: string,
 		private level: Level,
 	) {
 		this.id = uuidv4();

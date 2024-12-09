@@ -32,7 +32,7 @@ describe("Integration Test for Maze and Node", () => {
 		}
 	];
 	test("Maze start correctly sets nextNodes and isFinal", () => {
-		const maze = new Maze(["keyword1", "keyword2"], Level.HARD);
+		const maze = new Maze("keyword1", Level.HARD);
 
 		const node1 = maze.createNode("ur1")
 		const quiz1 = node1.createQuiz(mockQuizInfo[0], QuizType.FILL_BLANK)

@@ -100,12 +100,21 @@ export class QuizMultipleChoice extends Quiz {
 		this.correctAnswer = this.info.author;
 		let question = "Who is author of this comment: \n";
 		question += this.info.content;
+		const options = [
+			this.info.author,
+			...this.info.noiseAuthor
+		]
 		return {
 			question,
-			options: [
-				this.info.author,
-				...this.info.noiseAuthor
-			]
+			options: this.__shuffleArray(options)
 		} as IQuestionAgg;
+	}
+
+	private __shuffleArray(array: Array<string>) {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
 	}
 }
