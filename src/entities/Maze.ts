@@ -52,6 +52,10 @@ class Maze implements IMaze {
 		return this.nodes
 	}
 
+	getFirstNode() {
+		return this.nodes[0]
+	}
+
 	bumpUp() {
 		this.nodes.forEach((root, index) => {
 			if (index === this.nodes.length - 1) {

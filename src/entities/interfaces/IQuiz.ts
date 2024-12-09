@@ -18,6 +18,7 @@ export interface IQuiz {
 	readonly nodeId: UUIDTypes
 	completedPoint: number;
 	info: IExtendInfo;
+	isFinal: boolean
 	createQuestion(): IQuestionAgg;
 	checkAnswer(answer: string): boolean;
 }

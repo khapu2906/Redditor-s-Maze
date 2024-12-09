@@ -1,12 +1,9 @@
-import { Quick } from "./../entities/Quick"
 import Maze from "./../entities/Maze"
-import { Node } from "./../entities/Node"
 import { Level, LevelMaxNode } from "./../enums/Level";
 import IMaze from "../entities/interfaces/IMaze";
-import { IQuiz, IExtendInfo, IQuestionAgg } from "../interfaces/IQuiz";
-
-class MazeGame {
-	private maze: IMaze | null = null;
+import INode from "../entities/interfaces/INode";
+export class MazeGame {
+	public readonly maze: IMaze;
 	constructor(
 		keywords: Array<string>,
 		public level: Level
@@ -17,4 +14,11 @@ class MazeGame {
 		);
 	}
 
+	createNode(url: string): INode {
+		return this.maze.createNode(url)
+	}
+
+	getFirstNode() {
+		return this.maze.getFirstNode()
+	}
 }

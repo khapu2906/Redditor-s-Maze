@@ -15,6 +15,7 @@ export abstract class Quiz implements IQuiz {
 	protected correctAnswer: string = "";
 	protected startTime: Date | null = null;
 	protected endTime: Date | null = null;
+	public isFinal: boolean = false
 
 	constructor(
 		private level: Level,
