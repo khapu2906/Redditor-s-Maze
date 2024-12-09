@@ -1,5 +1,5 @@
 import INode from "./interfaces/INode";
-import { IQuick } from "./interfaces/IQuick";
+import { IQuiz } from "./interfaces/IQuiz";
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
@@ -19,7 +19,7 @@ class Node implements INode {
 	public isFinal: boolean = false
 
 	constructor(
-		private quicks: Array<IQuick>,
+		private quizs: Array<IQuiz>,
 		private level: Level,
 		public url: string
 	) {
@@ -61,8 +61,8 @@ class Node implements INode {
 	}
 
 	private _calculatePoint(completedTime: number): void {
-		for (const quick of this.quicks) {
-			this.completedPoint += quick.completedPoint;
+		for (const quiz of this.quizs) {
+			this.completedPoint += quiz.completedPoint;
 		}
 		this.rule.calculatePointWithTime(completedTime);
 		this.completedPoint += this.rule.maxCompletedPoint ?? 0;

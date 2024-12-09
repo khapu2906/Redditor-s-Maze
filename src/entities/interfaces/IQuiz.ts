@@ -11,7 +11,7 @@ export interface IQuestionAgg {
 	question: string;
 	options: Array<string>
 }
-export interface IQuick {
+export interface IQuiz {
 	completedPoint: number;
 	info: IExtendInfo;
 	createQuestion(): IQuestionAgg;

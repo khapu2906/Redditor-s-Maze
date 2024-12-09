@@ -4,7 +4,7 @@ export enum State {
 	DONE
 }
 
-export enum StateQuick {
+export enum StateQuiz {
 	NOT_YET,
 	WORKING,
 	SUCCESS,

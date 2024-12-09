@@ -1,8 +1,8 @@
-import { QuickFillBlank, QuickMultipleChoice } from './../../src/entities/Quick';
+import { QuizFillBlank, QuizMultipleChoice } from './../../src/entities/Quiz';
 import { Level } from './../../src/entities/enums/Level';
-import { StateQuick } from './../../src/entities/enums/State';
+import { StateQuiz } from './../../src/entities/enums/State';
 
-describe('QuickFillBlank Tests', () => {
+describe('QuizFillBlank Tests', () => {
 	const mockInfo = {
 		content: "This is a test sentence",
 		author: "Test Author",
@@ -11,32 +11,32 @@ describe('QuickFillBlank Tests', () => {
 	};
 
 	it('should create a question with a blank', () => {
-		const quickFillBlank = new QuickFillBlank(Level.EASY, mockInfo);
-		const questionAgg = quickFillBlank.createQuestion();
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const questionAgg = quizFillBlank.createQuestion();
 
 		expect(questionAgg.question).toContain('___');
 		expect(questionAgg.options).toEqual([]);
 	});
 
 	it('should check the correct answer - correct', () => {
-		const quickFillBlank = new QuickFillBlank(Level.EASY, mockInfo);
-		const questionAgg = quickFillBlank.createQuestion();
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const questionAgg = quizFillBlank.createQuestion();
 
-		const correctAnswer = quickFillBlank.getCorrectAnswer();
-		expect(quickFillBlank.checkAnswer(correctAnswer)).toBe(true);
+		const correctAnswer = quizFillBlank.getCorrectAnswer();
+		expect(quizFillBlank.checkAnswer(correctAnswer)).toBe(true);
 	});
 
 	it('should check the correct answer - wrong', () => {
-		const quickFillBlank = new QuickFillBlank(Level.EASY, mockInfo);
-		const questionAgg = quickFillBlank.createQuestion();
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const questionAgg = quizFillBlank.createQuestion();
 
-		const correctAnswer = quickFillBlank.getCorrectAnswer();
+		const correctAnswer = quizFillBlank.getCorrectAnswer();
 
-		expect(quickFillBlank.checkAnswer("Wrong Answer")).toBe(false);
+		expect(quizFillBlank.checkAnswer("Wrong Answer")).toBe(false);
 	});
 });
 
-describe('QuickMultipleChoice Tests', () => {
+describe('QuizMultipleChoice Tests', () => {
 	const mockInfo = {
 		content: "This is a test comment",
 		author: "Test Author",
@@ -45,8 +45,8 @@ describe('QuickMultipleChoice Tests', () => {
 	};
 
 	it('should create a multiple choice question', () => {
-		const quickMultipleChoice = new QuickMultipleChoice(Level.MEDIUM, mockInfo);
-		const questionAgg = quickMultipleChoice.createQuestion();
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		const questionAgg = quizMultipleChoice.createQuestion();
 
 		expect(questionAgg.question).toContain('Who is author of this comment:');
 		expect(questionAgg.options).toContain(mockInfo.author);
@@ -56,16 +56,16 @@ describe('QuickMultipleChoice Tests', () => {
 	});
 
 	it('should check the correct answer - correct', () => {
-		const quickMultipleChoice = new QuickMultipleChoice(Level.MEDIUM, mockInfo);
-		quickMultipleChoice.createQuestion();
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		quizMultipleChoice.createQuestion();
 
-		expect(quickMultipleChoice.checkAnswer(mockInfo.author)).toBe(true);
+		expect(quizMultipleChoice.checkAnswer(mockInfo.author)).toBe(true);
 	});
 
 	it('should check the correct answer - wrong', () => {
-		const quickMultipleChoice = new QuickMultipleChoice(Level.MEDIUM, mockInfo);
-		quickMultipleChoice.createQuestion();
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		quizMultipleChoice.createQuestion();
 
-		expect(quickMultipleChoice.checkAnswer("Wrong Author")).toBe(false);
+		expect(quizMultipleChoice.checkAnswer("Wrong Author")).toBe(false);
 	});
 });

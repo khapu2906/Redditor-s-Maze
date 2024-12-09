@@ -1,15 +1,15 @@
-import { IQuick, IExtendInfo, IQuestionAgg } from "./interfaces/IQuick";
+import { IQuiz, IExtendInfo, IQuestionAgg } from "./interfaces/IQuiz";
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
-import { RuleQuick } from "./Rules";
+import { RuleQuiz } from "./Rules";
 
-import { StateQuick } from "./enums/State";
+import { StateQuiz } from "./enums/State";
 
-export abstract class Quick implements IQuick {
+export abstract class Quiz implements IQuiz {
 	protected rule: IRule;
 	public completedPoint: number = 0;
-	private state: StateQuick = StateQuick.NOT_YET;
+	private state: StateQuiz = StateQuiz.NOT_YET;
 	protected correctAnswer: string = "";
 	protected startTime: Date | null = null;
 	protected endTime: Date | null = null;
@@ -18,7 +18,7 @@ export abstract class Quick implements IQuick {
 		private level: Level,
 		public info: IExtendInfo,
 	) {
-		this.rule = new RuleQuick(this.level)
+		this.rule = new RuleQuiz(this.level)
 	}
 
 	abstract createQuestion(): IQuestionAgg;
@@ -29,17 +29,17 @@ export abstract class Quick implements IQuick {
 	}
 
 	stateWorking() {
-		this.state = StateQuick.WORKING
+		this.state = StateQuiz.WORKING
 	}
 
 	stateSuccess(): void {
 		if (!this.startTime) {
-			throw new Error("Quick has not been started yet. Call start() before stateDone().");
+			throw new Error("Quiz has not been started yet. Call start() before stateDone().");
 		}
 		if (this.endTime) {
-			throw new Error("Quick end");
+			throw new Error("Quiz end");
 		}
-		this.state = StateQuick.SUCCESS
+		this.state = StateQuiz.SUCCESS
 		this.endTime = new Date();
 		const completedTime = this.endTime.getTime() - this.startTime.getTime() / 1000;
 		this.rule.calculatePointWithTime(completedTime)
@@ -48,12 +48,12 @@ export abstract class Quick implements IQuick {
 
 	stateFail() {
 		if (!this.startTime) {
-			throw new Error("Quick has not been started yet. Call start() before stateDone().");
+			throw new Error("Quiz has not been started yet. Call start() before stateDone().");
 		}
 		if (this.endTime) {
-			throw new Error("Quick end");
+			throw new Error("Quiz end");
 		}
-		this.state = StateQuick.FAIL
+		this.state = StateQuiz.FAIL
 		this.endTime = new Date();
 		this.rule.clearMaxCompletedPoint()
 		this.completedPoint = this.rule.maxCompletedPoint
@@ -74,7 +74,7 @@ export abstract class Quick implements IQuick {
 	}
 }
 
-export class QuickFillBlank extends Quick {
+export class QuizFillBlank extends Quiz {
 	override createQuestion(): IQuestionAgg {
 		this.start()
 		const words = this.info.content.split(' ');
@@ -89,7 +89,7 @@ export class QuickFillBlank extends Quick {
 	}
 }
 
-export class QuickMultipleChoice extends Quick {
+export class QuizMultipleChoice extends Quiz {
 	override createQuestion(): IQuestionAgg {
 		this.start()
 		this.correctAnswer = this.info.author;

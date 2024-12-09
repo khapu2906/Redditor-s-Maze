@@ -1,4 +1,4 @@
-import { RuleMaze, RuleNode, RuleQuick } from "./../../src/entities/Rules";
+import { RuleMaze, RuleNode, RuleQuiz } from "./../../src/entities/Rules";
 import { Level } from "./../../src/entities/enums/Level";
 import { DownTimePointKey } from "./../../src/entities/enums/Point";
 
@@ -13,9 +13,9 @@ describe("Rule Classes", () => {
 		expect(ruleNode.maxCompletedPoint).toBe(90);
 	});
 
-	test("RuleQuick initializes with correct maxCompletedPoint", () => {
-		const ruleQuick = new RuleQuick(Level.HARD);
-		expect(ruleQuick.maxCompletedPoint).toBe(50);
+	test("RuleQuiz initializes with correct maxCompletedPoint", () => {
+		const ruleQuiz = new RuleQuiz(Level.HARD);
+		expect(ruleQuiz.maxCompletedPoint).toBe(50);
 	});
 
 	test("RuleMaze calculates points correctly with time", () => {
@@ -50,19 +50,19 @@ describe("Rule Classes", () => {
 		expect(ruleNode.maxCompletedPoint).toBe(100 - 18);
 	});
 
-	test("RuleQuick calculates points correctly with time", () => {
-		const ruleQuick = new RuleQuick(Level.EASY);
+	test("RuleQuiz calculates points correctly with time", () => {
+		const ruleQuiz = new RuleQuiz(Level.EASY);
 
-		ruleQuick.calculatePointWithTime(1);
-		expect(ruleQuick.maxCompletedPoint).toBe(30 - 0);
+		ruleQuiz.calculatePointWithTime(1);
+		expect(ruleQuiz.maxCompletedPoint).toBe(30 - 0);
 
-		ruleQuick.calculatePointWithTime(3);
-		expect(ruleQuick.maxCompletedPoint).toBe(30 - 10);
+		ruleQuiz.calculatePointWithTime(3);
+		expect(ruleQuiz.maxCompletedPoint).toBe(30 - 10);
 
-		ruleQuick.calculatePointWithTime(7);
-		expect(ruleQuick.maxCompletedPoint).toBe(30 - 30);
+		ruleQuiz.calculatePointWithTime(7);
+		expect(ruleQuiz.maxCompletedPoint).toBe(30 - 30);
 
-		ruleQuick.calculatePointWithTime(15);
-		expect(ruleQuick.maxCompletedPoint).toBe(30 - 30);
+		ruleQuiz.calculatePointWithTime(15);
+		expect(ruleQuiz.maxCompletedPoint).toBe(30 - 30);
 	});
 });

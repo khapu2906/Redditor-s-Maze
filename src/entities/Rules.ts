@@ -5,7 +5,7 @@ import { DownTimePointKey } from "./enums/Point"
 
 const MAX_COMPLETED_POINT_MAZE  = 400;
 const MAX_COMPLETED_POINT_NODE  = 100;
-const MAX_COMPLETED_POINT_QUICK = 50;
+const MAX_COMPLETED_POINT_QUIZ = 50;
 
 
 const DownTimePoint = {
@@ -74,8 +74,8 @@ export class RuleNode extends Rule {
 	}
 }
 
-export class RuleQuick extends Rule {
-	public override maxCompletedPoint: number = MAX_COMPLETED_POINT_QUICK;
+export class RuleQuiz extends Rule {
+	public override maxCompletedPoint: number = MAX_COMPLETED_POINT_QUIZ;
 
 	constructor(
 		level: Level
