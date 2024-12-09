@@ -2,26 +2,16 @@ import Node from "./../../src/entities/Node";
 import { Level } from "./../../src/entities/enums/Level";
 import { State } from "./../../src/entities/enums/State";
 import { IQuiz } from "./../../src/entities/interfaces/IQuiz";
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 describe("Node Class", () => {
 	let mockQuiz: IQuiz;
-
+	const mazeId: UUIDTypes = uuidv4()
 	beforeEach(() => {
-		mockQuiz = {
-			completedPoint: 10,
-			info: {
-				content: "Sample content for testing",
-				author: "Test Author",
-				url: null,
-				noiseAuthor: ["Author1", "Author2"],
-			},
-			createQuestion: jest.fn(),
-			checkAnswer: jest.fn().mockReturnValue(true),
-		};
 	});
 
 	test("Node initializes correctly", () => {
-		const node = new Node([mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 
 		expect(node.completedPoint).toBe(0);
 		expect(node.getNextNodes()).toEqual([]);
@@ -29,8 +19,8 @@ describe("Node Class", () => {
 	});
 
 	test("addNextNode and getNextNodes work correctly", () => {
-		const node = new Node([mockQuiz], Level.MEDIUM, "test-url");
-		const nextNode = new Node([], Level.HARD, "next-url");
+		const node = new Node(Level.MEDIUM, "test-url", mazeId);
+		const nextNode = new Node(Level.HARD, "next-url", mazeId);
 
 		node.addNextNode(nextNode);
 
@@ -38,8 +28,8 @@ describe("Node Class", () => {
 	});
 
 	test("clearNextNodes works correctly", () => {
-		const node = new Node([mockQuiz], Level.MEDIUM, "test-url");
-		const nextNode = new Node([], Level.HARD, "next-url");
+		const node = new Node(Level.MEDIUM, "test-url", mazeId);
+		const nextNode = new Node(Level.HARD, "next-url", mazeId);
 
 		node.addNextNode(nextNode);
 		expect(node.getNextNodes()).toHaveLength(1);
@@ -49,7 +39,7 @@ describe("Node Class", () => {
 	});
 
 	test("start changes state to WORKING", () => {
-		const node = new Node([mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 		node.start();
 
 		expect(node["state"]).toBe(State.WORKING);
@@ -57,10 +47,10 @@ describe("Node Class", () => {
 	});
 
 	test("end calculates points and changes state to DONE", () => {
-		const node = new Node([mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 
 		node.start();
-		jest.spyOn(Date, "now").mockReturnValueOnce(node["startTime"]!.getTime() + 5000); // Giả lập thời gian
+		jest.spyOn(Date, "now").mockReturnValueOnce(node["startTime"]!.getTime() + 5000);
 
 		node.end();
 
@@ -69,13 +59,13 @@ describe("Node Class", () => {
 	});
 
 	test("end throws error if called without start", () => {
-		const node = new Node([mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 
 		expect(() => node.end()).toThrowError("Node has not been started yet. Call start() before stateDone().");
 	});
 
 	test("end throws error if called multiple times", () => {
-		const node = new Node([mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 
 		node.start();
 		node.end();
@@ -84,7 +74,7 @@ describe("Node Class", () => {
 	});
 
 	test("_calculatePoint adds points correctly", () => {
-		const node = new Node([mockQuiz, mockQuiz], Level.EASY, "test-url");
+		const node = new Node(Level.EASY, "test-url", mazeId);
 		const initialPoints = node.completedPoint;
 
 		node.start();

@@ -1,5 +1,7 @@
 
 
+import { UUIDTypes } from "uuid";
+
 export interface IExtendInfo {
 	content: string;
 	author: string;
@@ -12,6 +14,8 @@ export interface IQuestionAgg {
 	options: Array<string>
 }
 export interface IQuiz {
+	readonly id: UUIDTypes;
+	readonly nodeId: UUIDTypes
 	completedPoint: number;
 	info: IExtendInfo;
 	createQuestion(): IQuestionAgg;

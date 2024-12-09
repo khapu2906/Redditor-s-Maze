@@ -5,8 +5,10 @@ import IRule from "./interfaces/IRule"
 import { RuleQuiz } from "./Rules";
 
 import { StateQuiz } from "./enums/State";
-
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 export abstract class Quiz implements IQuiz {
+	public readonly id: UUIDTypes;
+
 	protected rule: IRule;
 	public completedPoint: number = 0;
 	private state: StateQuiz = StateQuiz.NOT_YET;
@@ -17,7 +19,9 @@ export abstract class Quiz implements IQuiz {
 	constructor(
 		private level: Level,
 		public info: IExtendInfo,
+		public readonly nodeId: UUIDTypes
 	) {
+		this.id = uuidv4();
 		this.rule = new RuleQuiz(this.level)
 	}
 

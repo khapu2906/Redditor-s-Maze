@@ -1,6 +1,7 @@
 import { QuizFillBlank, QuizMultipleChoice } from './../../src/entities/Quiz';
 import { Level } from './../../src/entities/enums/Level';
 import { StateQuiz } from './../../src/entities/enums/State';
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 describe('QuizFillBlank Tests', () => {
 	const mockInfo = {
@@ -11,7 +12,7 @@ describe('QuizFillBlank Tests', () => {
 	};
 
 	it('should create a question with a blank', () => {
-		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo, uuidv4());
 		const questionAgg = quizFillBlank.createQuestion();
 
 		expect(questionAgg.question).toContain('___');
@@ -19,7 +20,7 @@ describe('QuizFillBlank Tests', () => {
 	});
 
 	it('should check the correct answer - correct', () => {
-		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo, uuidv4());
 		const questionAgg = quizFillBlank.createQuestion();
 
 		const correctAnswer = quizFillBlank.getCorrectAnswer();
@@ -27,7 +28,7 @@ describe('QuizFillBlank Tests', () => {
 	});
 
 	it('should check the correct answer - wrong', () => {
-		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo);
+		const quizFillBlank = new QuizFillBlank(Level.EASY, mockInfo, uuidv4());
 		const questionAgg = quizFillBlank.createQuestion();
 
 		const correctAnswer = quizFillBlank.getCorrectAnswer();
@@ -45,7 +46,7 @@ describe('QuizMultipleChoice Tests', () => {
 	};
 
 	it('should create a multiple choice question', () => {
-		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo, uuidv4());
 		const questionAgg = quizMultipleChoice.createQuestion();
 
 		expect(questionAgg.question).toContain('Who is author of this comment:');
@@ -56,14 +57,14 @@ describe('QuizMultipleChoice Tests', () => {
 	});
 
 	it('should check the correct answer - correct', () => {
-		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo, uuidv4());
 		quizMultipleChoice.createQuestion();
 
 		expect(quizMultipleChoice.checkAnswer(mockInfo.author)).toBe(true);
 	});
 
 	it('should check the correct answer - wrong', () => {
-		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo);
+		const quizMultipleChoice = new QuizMultipleChoice(Level.MEDIUM, mockInfo, uuidv4());
 		quizMultipleChoice.createQuestion();
 
 		expect(quizMultipleChoice.checkAnswer("Wrong Author")).toBe(false);

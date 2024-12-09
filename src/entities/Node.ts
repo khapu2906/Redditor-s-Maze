@@ -1,13 +1,15 @@
 import INode from "./interfaces/INode";
-import { IQuiz } from "./interfaces/IQuiz";
+import { IQuiz, IExtendInfo } from "./interfaces/IQuiz";
+import { QuizType, QuizTypeClass } from "./enums/QuizType"
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
 import { RuleNode } from "./Rules";
 
 import { State } from "./enums/State";
-
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 class Node implements INode {
+	public readonly id: UUIDTypes;
 	public completedPoint: number = 0;
 
 	private rule: IRule;
@@ -17,12 +19,14 @@ class Node implements INode {
 	private endTime: Date | null = null;
 
 	public isFinal: boolean = false
+	private quizs: Array<IQuiz> = []
 
 	constructor(
-		private quizs: Array<IQuiz>,
 		private level: Level,
-		public url: string
+		public url: string,
+		public readonly mazeId: UUIDTypes
 	) {
+		this.id = uuidv4();
 		this.rule = new RuleNode(this.level)
 	}
 
@@ -36,6 +40,13 @@ class Node implements INode {
 
 	clearNextNodes(): void {
 		this.nextNodes = [];
+	}
+
+	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): IQuiz {
+		const quiz = new QuizTypeClass[type](this.level, info, this.id)
+		this.quizs.push(quiz)
+
+		return quiz;
 	}
 
 	stateWorking() {

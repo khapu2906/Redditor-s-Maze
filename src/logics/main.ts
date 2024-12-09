@@ -1,20 +1,20 @@
 import { Quick } from "./../entities/Quick"
-import Maze from "./../entities/Maze.js"
+import Maze from "./../entities/Maze"
 import { Node } from "./../entities/Node"
 import { Level, LevelMaxNode } from "./../enums/Level";
 import IMaze from "../entities/interfaces/IMaze";
+import { IQuiz, IExtendInfo, IQuestionAgg } from "../interfaces/IQuiz";
 
 class MazeGame {
 	private maze: IMaze | null = null;
-	constructor() {}
-	public createMaze(
+	constructor(
 		keywords: Array<string>,
-		level: Level
+		public level: Level
 	) {
 		this.maze = new Maze(
 			keywords,
-			level,
-			[]
+			level
 		);
 	}
+
 }

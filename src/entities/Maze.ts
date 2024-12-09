@@ -7,31 +7,41 @@ import IRule from "./interfaces/IRule"
 import { RuleMaze } from "./Rules";
 
 import { State } from "./enums/State";
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
+import Node from "./Node";
 
 class Maze implements IMaze {
+	public readonly id: UUIDTypes;
 	private rule: IRule;
 	public completedPoint: number = 0;
 	private state: State = State.NOT_YET;
 	private startTime: Date | null = null;
 	private endTime: Date | null = null;
+	private nodes: Array<INode> = []
 
 	constructor(
 		private keywords: Array<string>,
 		private level: Level,
-		private nodes: Array<INode>
 	) {
+		this.id = uuidv4();
 		this.rule = new RuleMaze(this.level)
-
-		if (this.nodes.length !== LevelMaxNode[this.level]) {
-			throw new Error("Amount of Node invalid")
-		}
 	}
 
 	start() {
 		this.startTime = new Date()
 		this.bumpUp()
 		this.state = State.WORKING;
+	}
+
+	createNode(url: string): INode {
+		if (this.nodes.length + 1 > LevelMaxNode[this.level]) {
+			throw new Error("Amount of Node invalid")
+		}
+		const node = new Node(this.level, url, this.id)
+		this.nodes.push(node)
+		
+		return node
 	}
 
 	getKeyWords() {
