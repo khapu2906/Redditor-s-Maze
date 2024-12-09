@@ -46,7 +46,7 @@ export abstract class Quiz implements IQuiz {
 		}
 		this.state = StateQuiz.SUCCESS
 		this.endTime = new Date();
-		const completedTime = this.endTime.getTime() - this.startTime.getTime() / 1000;
+		const completedTime = this.endTime.getTime() - this.startTime.getTime() / (60 * 1000);
 		this.rule.calculatePointWithTime(completedTime)
 		this.completedPoint = this.rule.maxCompletedPoint;
 	}

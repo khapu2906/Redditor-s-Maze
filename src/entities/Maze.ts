@@ -82,7 +82,7 @@ class Maze implements IMaze {
 		}
 		this.state = State.DONE;
 		this.endTime = new Date();
-		const completedTime = this.endTime.getTime() - this.startTime.getTime() / 1000;
+		const completedTime = this.endTime.getTime() - this.startTime.getTime() / (60 * 1000);
 		this._calculatePoint(completedTime);
 	}
 
