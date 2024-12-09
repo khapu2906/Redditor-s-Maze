@@ -5,6 +5,8 @@ interface IMaze {
 	completedPoint: number
 	createNode(url: string): INode;
 	getFirstNode(): INode;
+	start(): void;
+	end(): void;
 }
 
 export default IMaze;

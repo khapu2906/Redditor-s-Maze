@@ -13,6 +13,8 @@ interface INode {
 	addNextNode(node: INode): void
 	clearNextNodes(): void;
 	createQuiz(info: IExtendInfo, type: QuizType): IQuiz;
+	end(): void;
+	start(): void;
 }
 
 export default INode;
