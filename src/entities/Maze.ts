@@ -31,6 +31,7 @@ class Maze implements IMaze {
 	start() {
 		this.startTime = new Date()
 		this.bumpUp()
+		this.nodes[0].start()
 		this.state = State.WORKING;
 	}
 
