@@ -1,8 +1,10 @@
 import { Devvit, useState, useInterval} from '@devvit/public-api';
+import Start from "./Start.js";
+import Maze from "../entities/Maze.js";
 
-const duration = 5;
+const duration = 1;
 
-export default function Transition({startGame}) {
+export default function Transition({startGame, maze}) {
     const [counter, setCounter] = useState(duration);
 
     if (counter == 0 ) {
@@ -14,6 +16,7 @@ export default function Transition({startGame}) {
     }, 1000);
 
     function startCounter() {
+        maze.start();
         updateInterval.start();
     }
 
