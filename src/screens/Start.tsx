@@ -9,19 +9,21 @@ const difficulties = [
   { string: "Hard", value: Level.HARD },
 ];
 
+const keywords = [
+  { string: "Home", value: "Home" },
+  { string: "memes", value: "memes" },
+  { string: "NoStupidQuestions", value: "NoStupidQuestions" },
+  { string: "gaming", value: "gaming" },
+];
+
 export default function Start({
   context,
-  transition,
-  setMaze,
-  service,
-}: {
-  context: any;
-  transition: Function;
-  setMaze: Function;
-  service: Service;
+  setScreen,
+  setKeyword,
+  setDifficulty,
 }) {
-  const [keyword, setKeyword] = useState("");
-  const [difficulty, setDifficulty] = useState(Level.EASY);
+  const [keyword, _setKeyword] = useState("");
+  const [difficulty, _setDifficulty] = useState(Level.EASY);
 
   const difficultyForm = useForm(
     {
@@ -36,20 +38,23 @@ export default function Start({
         },
       ],
     },
-    (values) => setDifficulty(values.difficulty),
+    (values) => _setDifficulty(values.difficulty),
   );
 
   const keywordForm = useForm(
     {
       fields: [
         {
-          type: "string",
+          type: "select",
           name: "keyword",
-          label: "Keywords(separated by a white space)",
+          label: "Keyword",
+          options: keywords.map((obj) => {
+            return { label: obj.string, value: obj.value };
+          }),
         },
       ],
     },
-    (values) => setKeyword(values.keyword),
+    (values) => _setKeyword(values.keyword[0]),
   );
 
   function showKeywordsForm() {
@@ -61,8 +66,9 @@ export default function Start({
   }
 
   function onStart() {
-    setMaze(service.startMaze(keyword, difficulty));
-    transition();
+    setKeyword(keyword);
+    setDifficulty(difficulty);
+    setScreen();
   }
 
   const text =

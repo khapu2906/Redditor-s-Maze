@@ -6,6 +6,7 @@ import Maze from "./entities/Maze.js";
 import { Service } from "./service.js";
 import Timer from "./components/Timer.js";
 import Quiz from "./screens/Quiz.js";
+import { Level } from "./entities/enums/Level.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -39,33 +40,46 @@ Devvit.addCustomPostType({
   height: "regular",
   render: (context) => {
     const [screen, setScreen] = useState(0);
-      const [maze, setMaze] = useState(null)
-      const [service, setService] = useState(null);
+    const [maze, setMaze] = useState(null);
+    const [service, setService] = useState(null);
+    const [keyword, setKeyword] = useState("");
+    const [difficulty, setDifficulty] = useState(Level.EASY);
 
-    let currentScreen = (
-      // <Start context={context} transition={transition} setMaze={setMaze} service={service} />
-        <Quiz context={context} duration={10000} />
-    );
+    let currentScreen;
 
     switch (screen) {
       case 1:
-        currentScreen = <Transition startGame={startGame} maze={maze} />;
-        break;
-      case 2:
-        // start game
+        // transision
+        currentScreen = (
+          <Transition
+            keyword={keyword}
+            difficulty={difficulty}
+            setMaze={setMaze}
+            service={new Service(context)}
+            startGame={startGame}
+          />
+        );
         break;
       default:
         currentScreen = (
-            //<Start context={context} transition={transition} setMaze={setMaze} service={service} />
-            <Quiz context={context} duration={10000} />
+          <Start
+            context={context}
+            setScreen={transitionScreen}
+            setKeyword={setKeyword}
+            setDifficulty={setDifficulty}
+          />
         );
     }
 
     function startGame() {
-      setScreen(2);
+      maze.start();
     }
 
-    function transition() {
+    function startScreen() {
+      setScreen(0);
+    }
+
+    function transitionScreen() {
       setScreen(1);
     }
 

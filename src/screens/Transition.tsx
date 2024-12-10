@@ -1,33 +1,37 @@
-import { Devvit, useState, useInterval} from '@devvit/public-api';
-import Start from "./Start.js";
+import { Devvit, useState, useInterval } from "@devvit/public-api";
 import Maze from "../entities/Maze.js";
+import { Service } from "../service.js";
+import { Level } from "../entities/enums/Level.js";
 
-const duration = 1;
-
-export default function Transition({startGame, maze}) {
-    const [counter, setCounter] = useState(duration);
-
-    if (counter == 0 ) {
-        startGame();
-    }
-
-    const updateInterval = useInterval(() => {
-        setCounter((counter) => counter - 1);
-    }, 1000);
-
-    function startCounter() {
-        maze.start();
-        updateInterval.start();
-    }
-
-    return (
-        <vstack alignment="center middle" height="100%">
-            <text size="xxlarge">{counter}</text>
-            <button appearance="primary"
-                    onPress={startCounter}
-            >
-                Start
-            </button>
-        </vstack>
+export default function Transition({
+  setMaze,
+  service,
+  keyword,
+  difficulty,
+  startGame,
+}: {
+    setMaze: Function;
+    service: Service;
+    keyword: string;
+    difficulty: Level;
+    startGame: Function;
+}) {
+    const [maze, _setMaze]: [maze: Maze, _setMaze: Function] = useState(
+        service.startMaze(keyword, difficulty),
     );
+
+    function start() {
+        setMaze(maze);
+        console.debug(maze);
+        startGame();
+   }
+
+  return (
+    <vstack gap="medium" alignment="center middle" height="100%">
+      <text size="xxlarge">Ready?</text>
+      <button appearance="primary" onPress={start}>
+        Start
+      </button>
+    </vstack>
+  );
 }
