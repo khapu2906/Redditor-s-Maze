@@ -1,11 +1,26 @@
 import { Devvit, useState, useForm } from "@devvit/public-api";
 import Maze from "../entities/Maze.js";
-import {Level} from "../entities/enums/Level.js"
+import { Level } from "../entities/enums/Level.js";
+import { Service } from "../service.js";
 
-const difficulties = [{ string: "Easy", value: Level.EASY }, { string: "Medium", value: Level.MEDIUM },{  string: "Hard", value: Level.HARD }];
+const difficulties = [
+  { string: "Easy", value: Level.EASY },
+  { string: "Medium", value: Level.MEDIUM },
+  { string: "Hard", value: Level.HARD },
+];
 
-export default function Start({ context, transition, setMaze }) {
-  const [keywords, setKeywords] = useState([]);
+export default function Start({
+  context,
+  transition,
+  setMaze,
+  service,
+}: {
+  context: any;
+  transition: Function;
+  setMaze: Function;
+  service: Service;
+}) {
+  const [keyword, setKeyword] = useState("");
   const [difficulty, setDifficulty] = useState(Level.EASY);
 
   const difficultyForm = useForm(
@@ -29,12 +44,12 @@ export default function Start({ context, transition, setMaze }) {
       fields: [
         {
           type: "string",
-          name: "keywords",
+          name: "keyword",
           label: "Keywords(separated by a white space)",
         },
       ],
     },
-    (values) => setKeywords(values.keywords?.split(/\s+/)),
+    (values) => setKeyword(values.keyword),
   );
 
   function showKeywordsForm() {
@@ -45,41 +60,43 @@ export default function Start({ context, transition, setMaze }) {
     context.ui.showForm(difficultyForm);
   }
 
-    function onStart() {
-        const maze = new Maze(keywords, difficulty);
-        setMaze(maze);
-        transition();
-    }
+  function onStart() {
+    setMaze(service.startMaze(keyword, difficulty));
+    transition();
+  }
 
   const text =
-    keywords.length == 0 ? (
+    keyword == "" ? (
       <text color="neutral-content-weak">Keyword</text>
     ) : (
-      <text>{keywords}</text>
+      <text>{keyword}</text>
     );
 
-    const button = keywords.length == 0 ? (
-        // disable button if no keywore entered
-        <button appearance="secondary">Start</button>
+  const button =
+    keyword == "" ? (
+      // disable button if no keywore entered
+      <button appearance="secondary">Start</button>
     ) : (
-        <button appearance="primary" onPress={onStart}>Start</button>
+      <button appearance="primary" onPress={onStart}>
+        Start
+      </button>
     );
 
-    const difficultyText = difficulties.find((obj) => obj.value == difficulty).string;
-            
-    return (
-        <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-            <hstack gap="medium" alignment="middle center">
-                {text}
-                <button icon="topic-programming" onPress={showKeywordsForm}></button>
-            </hstack>
-            <hstack gap="medium" alignment="middle center">
-                <text>Difficulty: {difficultyText}</text>
-                <button icon="caret-down" onPress={showDifficultyForm}></button>
-            </hstack>
-            {
-                button
-            }
+  const difficultyText = difficulties.find(
+    (obj) => obj.value == difficulty,
+  ).string;
+
+  return (
+    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
+      <hstack gap="medium" alignment="middle center">
+        {text}
+        <button icon="topic-programming" onPress={showKeywordsForm}></button>
+      </hstack>
+      <hstack gap="medium" alignment="middle center">
+        <text>Difficulty: {difficultyText}</text>
+        <button icon="caret-down" onPress={showDifficultyForm}></button>
+      </hstack>
+      {button}
     </vstack>
   );
 }

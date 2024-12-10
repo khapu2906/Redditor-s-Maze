@@ -3,6 +3,9 @@ import { Devvit, useState } from "@devvit/public-api";
 import Start from "./screens/Start.js";
 import Transition from "./screens/Transition.js";
 import Maze from "./entities/Maze.js";
+import { Service } from "./service.js";
+import Timer from "./components/Timer.js";
+import Quiz from "./screens/Quiz.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -37,9 +40,11 @@ Devvit.addCustomPostType({
   render: (context) => {
     const [screen, setScreen] = useState(0);
       const [maze, setMaze] = useState(null)
+      const [service, setService] = useState(null);
 
     let currentScreen = (
-      <Start context={context} transition={transition} setMaze={setMaze} />
+      // <Start context={context} transition={transition} setMaze={setMaze} service={service} />
+        <Quiz context={context} duration={10000} />
     );
 
     switch (screen) {
@@ -51,7 +56,8 @@ Devvit.addCustomPostType({
         break;
       default:
         currentScreen = (
-          <Start context={context} transition={transition} setMaze={setMaze} />
+            //<Start context={context} transition={transition} setMaze={setMaze} service={service} />
+            <Quiz context={context} duration={10000} />
         );
     }
 

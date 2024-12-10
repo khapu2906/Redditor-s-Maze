@@ -6,7 +6,7 @@ import { RuleQuiz } from "./Rules";
 
 import { StateQuiz } from "./enums/State";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
-export abstract class Quiz implements IQuiz {
+export abstract class Quizz implements IQuiz {
 	public readonly id: UUIDTypes;
 
 	protected rule: IRule;
@@ -79,7 +79,7 @@ export abstract class Quiz implements IQuiz {
 	}
 }
 
-export class QuizFillBlank extends Quiz {
+export class QuizFillBlank extends Quizz {
 	override createQuestion(): IQuestionAgg {
 		this.start()
 		const words = this.info.content.split(' ');
@@ -94,7 +94,7 @@ export class QuizFillBlank extends Quiz {
 	}
 }
 
-export class QuizMultipleChoice extends Quiz {
+export class QuizMultipleChoice extends Quizz {
 	override createQuestion(): IQuestionAgg {
 		this.start()
 		this.correctAnswer = this.info.author;

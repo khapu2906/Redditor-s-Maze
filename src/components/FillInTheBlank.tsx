@@ -1,10 +1,10 @@
 import { useState, Devvit, useForm } from "@devvit/public-api";
 
-function FillInTheBlanks({ context, question, answer }) {
+function FillInTheBlank({ context, question, answer, isDone }) {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
     function checkAnswer(values) {
-        setIsCorrect(
+        isDone(
             values.answer.trim().toLowerCase() === answer.toLowerCase(),
         );
     }
@@ -21,7 +21,7 @@ function FillInTheBlanks({ context, question, answer }) {
     }
 
     return (
-        <vstack height="100%" width="100%" gap="medium" alignment="center middle">
+        <vstack gap="medium" alignment="center middle">
             <text size="large">Fill in the blank:</text>
             <text size="medium">{question}</text>
 
@@ -38,4 +38,4 @@ function FillInTheBlanks({ context, question, answer }) {
   );
 }
 
-export default FillInTheBlanks;
+export default FillInTheBlank;
