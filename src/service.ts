@@ -1,5 +1,4 @@
 import Maze from "./entities/Maze"
-import IMaze from "./entities/interfaces/IMaze"
 
 import { Level, LevelMaxNode } from "./entities/enums/Level";
 import { QuizType } from "./entities/enums/QuizType";
@@ -41,7 +40,7 @@ const redditUsernames: Array<string> = [
 export class Service {
 	constructor(private context: any) {}
 
-	async startMaze(kw: string, level: Level): IMaze {
+	async startMaze(kw: string, level: Level): Maze {
 		// start maze
 		const maze = new Maze(kw, level)
 		const posts: Array<any> = await this.context.reddit.getHotPosts({
