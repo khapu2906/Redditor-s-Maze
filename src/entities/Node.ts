@@ -1,28 +1,30 @@
-import INode from "./interfaces/INode";
-import { IQuiz, IExtendInfo } from "./interfaces/IQuiz";
-import { QuizType, QuizTypeClass } from "./enums/QuizType"
+import { IExtendInfo } from "./interfaces/IQuiz";
+import { QuizType } from "./enums/QuizType.js"
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
-import { RuleNode } from "./Rules";
+import { RuleNode, calculatePointWithTime } from "./Rules";
 
-import { State } from "./enums/State";
+import { State } from "./enums/State.js";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
-class Node implements INode {
+
+import { Quiz } from "./Quiz";
+
+export class Node {
 	public readonly id: UUIDTypes;
 	public completedPoint: number = 0;
 
-	private rule: IRule;
-	private nextNodes: Array<INode> = []
-	private state: State = State.NOT_YET;
-	private startTime: Date | null = null;
-	private endTime: Date | null = null;
+	public rule: IRule;
+	public nextNodes: Array<Node> = []
+	public state: State = State.NOT_YET;
+	public startTime: Date | null = null;
+	public endTime: Date | null = null;
 
 	public isFinal: boolean = false
-	private quizs: Array<IQuiz> = []
+	public quizs: Array<Quiz> = []
 
 	constructor(
-		private level: Level,
+		public level: Level,
 		public url: string,
 		public readonly mazeId: UUIDTypes
 	) {
@@ -30,7 +32,7 @@ class Node implements INode {
 		this.rule = new RuleNode(this.level)
 	}
 
-	addNextNode(node: INode) {
+	addNextNode(node: Node) {
 		this.nextNodes.push(node);
 	}
 
@@ -42,42 +44,38 @@ class Node implements INode {
 		this.nextNodes = [];
 	}
 
-	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): IQuiz {
-		const quiz = new QuizTypeClass[type](this.level, info, this.id)
+	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {
+		const quiz = new Quiz(this.level, info, this.id, type)
 		this.quizs.push(quiz)
 
 		return quiz;
 	}
+}
 
-	stateWorking() {
-		this.state = State.WORKING
-	}
+export function start(node: Node) {
+	node.startTime = new Date()
+	node.state = State.WORKING
 
-	start() {
-		this.startTime = new Date()
-		this.stateWorking()
-	}
+	return node
+}
 
-	end() {
-		if (!this.startTime) {
-			throw new Error("Node has not been started yet. Call start() before stateDone().");
-		}
-		if (this.endTime) {
-			throw new Error("Node end");
-		}
-		this.state = State.DONE
-		this.endTime = new Date();
-		const completedTime = this.endTime.getTime() - this.startTime.getTime() / (60 * 1000);
-		this._calculatePoint(completedTime)
+export function end(node: Node) {
+	if (!node.startTime) {
+		throw new Error("Node has not been started yet. Call start() before stateDone().");
 	}
+	if (node.endTime) {
+		throw new Error("Node end");
+	}
+	node.state = State.DONE
+	node.endTime = new Date();
+	const completedTime = node.endTime.getTime() - node.startTime.getTime() / (60 * 1000);
+	for (const quiz of node.quizs) {
+		node.completedPoint += quiz.completedPoint;
+	}
+	calculatePointWithTime(node.rule, completedTime);
+	node.completedPoint += node.rule.maxCompletedPoint ?? 0;
 
-	private _calculatePoint(completedTime: number): void {
-		for (const quiz of this.quizs) {
-			this.completedPoint += quiz.completedPoint;
-		}
-		this.rule.calculatePointWithTime(completedTime);
-		this.completedPoint += this.rule.maxCompletedPoint ?? 0;
-	}
+	return node;
 }
 
 export default Node;

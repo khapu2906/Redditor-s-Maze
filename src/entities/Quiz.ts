@@ -1,120 +1,118 @@
-import { IQuiz, IExtendInfo, IQuestionAgg } from "./interfaces/IQuiz";
+import { IExtendInfo, IQuestionAgg } from "./interfaces/IQuiz";
+import { QuizType } from "./enums/QuizType"
 
 import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
-import { RuleQuiz } from "./Rules";
+import { RuleQuiz, calculatePointWithTime, clearMaxCompletedPoint } from "./Rules";
 
-import { StateQuiz } from "./enums/State";
+import { StateQuiz } from "./enums/State.js";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
-export abstract class Quizz implements IQuiz {
+
+
+export class Quiz {
 	public readonly id: UUIDTypes;
 
-	protected rule: IRule;
+	public rule: IRule;
 	public completedPoint: number = 0;
-	private state: StateQuiz = StateQuiz.NOT_YET;
-	protected correctAnswer: string = "";
-	protected startTime: Date | null = null;
-	protected endTime: Date | null = null;
+	public state: StateQuiz = StateQuiz.NOT_YET;
+	public correctAnswer: string = "";
+	public startTime: Date | null = null;
+	public endTime: Date | null = null;
 	public isFinal: boolean = false
 
 	constructor(
-		private level: Level,
+		public level: Level,
 		public info: IExtendInfo,
-		public readonly nodeId: UUIDTypes
+		public readonly nodeId: UUIDTypes,
+		public type: QuizType
 	) {
 		this.id = uuidv4();
 		this.rule = new RuleQuiz(this.level)
 	}
+}
 
-	abstract createQuestion(): IQuestionAgg;
+export function start(quiz: Quiz) {
+	quiz.startTime = new Date()
+	quiz.state = StateQuiz.WORKING
 
-	start() {
-		this.startTime = new Date()
-		this.stateWorking()
+	return quiz
+}
+
+export function checkAnswer(quiz: Quiz, answer: string) {
+	let result = false
+
+	if (!quiz.startTime) {
+		throw new Error("Quiz has not been started yet. Call start() before stateDone().");
+	}
+	if (quiz.endTime) {
+		throw new Error("Quiz end");
 	}
 
-	stateWorking() {
-		this.state = StateQuiz.WORKING
+	if (answer.toLowerCase() === quiz.correctAnswer.toLowerCase()) {
+		result = true
+		quiz.state = StateQuiz.SUCCESS
+		quiz.endTime = new Date();
+		const completedTime = quiz.endTime.getTime() - quiz.startTime.getTime() / (60 * 1000);
+		calculatePointWithTime(quiz.rule, completedTime)
+		quiz.completedPoint = quiz.rule.maxCompletedPoint;
+	} else {
+		quiz.state = StateQuiz.FAIL
+		quiz.endTime = new Date();
+		clearMaxCompletedPoint(quiz.rule)
+		quiz.completedPoint = quiz.rule.maxCompletedPoint
+		result = false
 	}
 
-	stateSuccess(): void {
-		if (!this.startTime) {
-			throw new Error("Quiz has not been started yet. Call start() before stateDone().");
-		}
-		if (this.endTime) {
-			throw new Error("Quiz end");
-		}
-		this.state = StateQuiz.SUCCESS
-		this.endTime = new Date();
-		const completedTime = this.endTime.getTime() - this.startTime.getTime() / (60 * 1000);
-		this.rule.calculatePointWithTime(completedTime)
-		this.completedPoint = this.rule.maxCompletedPoint;
-	}
-
-	stateFail() {
-		if (!this.startTime) {
-			throw new Error("Quiz has not been started yet. Call start() before stateDone().");
-		}
-		if (this.endTime) {
-			throw new Error("Quiz end");
-		}
-		this.state = StateQuiz.FAIL
-		this.endTime = new Date();
-		this.rule.clearMaxCompletedPoint()
-		this.completedPoint = this.rule.maxCompletedPoint
-	}
-
-	public checkAnswer(answer: string): boolean {
-		if (answer.toLowerCase() === this.correctAnswer.toLowerCase()) {
-			this.stateSuccess()
-			return true;
-		} else {
-			this.stateFail();
-			return false
-		}
-	}
-
-	getCorrectAnswer(): string {
-		return this.correctAnswer;
+	return {
+		quiz,
+		result
 	}
 }
 
-export class QuizFillBlank extends Quizz {
-	override createQuestion(): IQuestionAgg {
-		this.start()
-		const words = this.info.content.split(' ');
+export function createQuiz(quiz: Quiz) {
+	switch (quiz.type) {
+		case QuizType.FILL_BLANK:
+			start(quiz)
+			const words = quiz.info.content.split(' ');
 
-		const randomIndex = Math.floor(Math.random() * words.length);
-		this.correctAnswer = words[randomIndex];
-		words[randomIndex] = "___";
-		return {
-			question: words.join(' '),
-			options: []
-		} as IQuestionAgg
-	}
-}
+			const randomIndex = Math.floor(Math.random() * words.length);
+			quiz.correctAnswer = words[randomIndex];
+			words[randomIndex] = "___";
+			const questAgg =  {
+				question: words.join(' '),
+				options: []
+			} as IQuestionAgg
 
-export class QuizMultipleChoice extends Quizz {
-	override createQuestion(): IQuestionAgg {
-		this.start()
-		this.correctAnswer = this.info.author;
-		let question = "Who is author of this comment: \n";
-		question += this.info.content;
-		const options = [
-			this.info.author,
-			...this.info.noiseAuthor
-		]
-		return {
-			question,
-			options: this.__shuffleArray(options)
-		} as IQuestionAgg;
-	}
+			return {
+				quiz,
+				questAgg
+			}
+		case QuizType.MULTIPLE_CHOICE:
+			start(quiz)
+			quiz.correctAnswer = quiz.info.author;
+			let question = "Who is author of this comment: \n";
+			question += quiz.info.content;
+			const options = [
+				quiz.info.author,
+				...quiz.info.noiseAuthor
+			]
+			function __shuffleArray(array: Array<string>) {
+				for (let i = array.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[array[i], array[j]] = [array[j], array[i]];
+				}
+				return array;
+			}
 
-	private __shuffleArray(array: Array<string>) {
-		for (let i = array.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[array[i], array[j]] = [array[j], array[i]];
-		}
-		return array;
+			const questAggMC = {
+				question: words.join(' '),
+				options: __shuffleArray(options)
+			} as IQuestionAgg
+
+			return {
+				quiz,
+				questAgg: questAggMC
+			}
+		
 	}
 }

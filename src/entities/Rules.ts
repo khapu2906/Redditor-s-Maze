@@ -1,5 +1,5 @@
+import IRule from "./interfaces/IRule";
 
-import IRule from "./interfaces/IRule"
 import { Level, DownLevelPoint, DownLevelWithTimeRate } from "./enums/Level"
 import { DownTimePointKey } from "./enums/Point"
 
@@ -24,30 +24,6 @@ class Rule implements IRule {
 
 	protected setMaxCompletedPoint() {
 		this.maxCompletedPoint += DownLevelPoint[this.level]
-	}
-
-	public clearMaxCompletedPoint() {
-		this.maxCompletedPoint = 0;
-	}
-
-	public calculatePointWithTime(completedTime: number): void {
-		let downTimePointKey: DownTimePointKey;
-
-		if (completedTime < 2) {
-			downTimePointKey = DownTimePointKey.BY2M
-		} else if (completedTime < 5) {
-			downTimePointKey = DownTimePointKey.F2MT5M
-		} else if (completedTime < 10) {
-			downTimePointKey = DownTimePointKey.F5MT10M
-		} else {
-			downTimePointKey = DownTimePointKey.AF10M
-		}
-
-		const downTimePoint: number = DownTimePoint[downTimePointKey];
-		const downTimePointRateWithLevel: number = DownLevelWithTimeRate[this.level]
-
-		this.maxCompletedPoint -= downTimePoint * downTimePointRateWithLevel;
-		this.maxCompletedPoint = this.maxCompletedPoint > 0 ? this.maxCompletedPoint : 0;
 	}
 }
 
@@ -83,4 +59,33 @@ export class RuleQuiz extends Rule {
 		super(level);
 		this.setMaxCompletedPoint()
 	}
+}
+
+export function clearMaxCompletedPoint(rule: IRule) {
+	rule.maxCompletedPoint = 0;
+
+	return rule
+}
+
+export function calculatePointWithTime(rule: IRule, completedTime: number) {
+	let downTimePointKey: DownTimePointKey;
+
+	if(completedTime < 2) {
+		downTimePointKey = DownTimePointKey.BY2M
+	} else if(completedTime < 5) {
+		downTimePointKey = DownTimePointKey.F2MT5M
+	} else if(completedTime < 10) {
+		downTimePointKey = DownTimePointKey.F5MT10M
+	} else {
+		downTimePointKey = DownTimePointKey.AF10M
+	}
+
+	const downTimePoint: number = DownTimePoint[downTimePointKey];
+
+	const downTimePointRateWithLevel: number = DownLevelWithTimeRate[rule.level]
+
+	rule.maxCompletedPoint -= downTimePoint * downTimePointRateWithLevel;
+	rule.maxCompletedPoint = rule.maxCompletedPoint > 0 ? rule.maxCompletedPoint : 0;
+
+	return rule
 }

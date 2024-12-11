@@ -22,7 +22,7 @@ export default function Transition({
 
     function start() {
         setMaze(maze);
-        console.debug(maze);
+        // console.debug(maze);
         startGame();
    }
 

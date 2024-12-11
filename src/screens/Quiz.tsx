@@ -5,7 +5,7 @@ import FillInTheBlank from "../components/FillInTheBlank.js";
 export default function Quiz({ context, duration, node}) {
   const [isDone, setIsDone] = useState(false);
 
-    console.debug(node)
+  console.debug(node.nodes[0].rule)
   let body;
   if (isDone) {
     // test getting reference to firstNode

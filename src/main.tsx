@@ -46,6 +46,7 @@ Devvit.addCustomPostType({
     } = useAsync(
       async () => await new Service(context).startMaze("gaming", Level.EASY),
     );
+    
     const [service, setService] = useState(null);
     const [keyword, setKeyword] = useState("");
     const [difficulty, setDifficulty] = useState(Level.EASY);
@@ -53,7 +54,7 @@ Devvit.addCustomPostType({
     let currentScreen = loading ? (
       <text>Loading maze</text>
     ) : (
-      <Quiz context={context} duration={10000} node={maze.getFirstNode()} />
+      <Quiz context={context} duration={10000} node={maze} />
     );
 
     if (error) {
