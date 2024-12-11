@@ -1,5 +1,5 @@
 // Learn more at developers.reddit.com/docs
-import { Devvit, useState } from "@devvit/public-api";
+import { Devvit, useAsync, useState } from "@devvit/public-api";
 import Start from "./screens/Start.js";
 import Transition from "./screens/Transition.js";
 import Maze from "./entities/Maze.js";
@@ -34,53 +34,30 @@ Devvit.addMenuItem({
   },
 });
 
-// Add a post type definition
 Devvit.addCustomPostType({
   name: "Experience Post",
   height: "regular",
   render: (context) => {
     const [screen, setScreen] = useState(0);
-    const [maze, setMaze] = useState(null);
+    const {
+      data: maze,
+      loading,
+      error,
+    } = useAsync(
+      async () => await new Service(context).startMaze("gaming", Level.EASY),
+    );
     const [service, setService] = useState(null);
     const [keyword, setKeyword] = useState("");
     const [difficulty, setDifficulty] = useState(Level.EASY);
 
-    let currentScreen;
+    let currentScreen = loading ? (
+      <text>Loading maze</text>
+    ) : (
+      <Quiz context={context} duration={10000} node={maze.getFirstNode()} />
+    );
 
-    switch (screen) {
-      case 1:
-        // transision
-        currentScreen = (
-          <Transition
-            keyword={keyword}
-            difficulty={difficulty}
-            setMaze={setMaze}
-            service={new Service(context)}
-            startGame={startGame}
-          />
-        );
-        break;
-      default:
-        currentScreen = (
-          <Start
-            context={context}
-            setScreen={transitionScreen}
-            setKeyword={setKeyword}
-            setDifficulty={setDifficulty}
-          />
-        );
-    }
-
-    function startGame() {
-      maze.start();
-    }
-
-    function startScreen() {
-      setScreen(0);
-    }
-
-    function transitionScreen() {
-      setScreen(1);
+    if (error) {
+      currentScreen = <text>Error getting subreddit</text>;
     }
 
     return <blocks>{currentScreen}</blocks>;

@@ -2,30 +2,29 @@ import { Devvit, useState, useInterval } from "@devvit/public-api";
 import Timer from "../components/Timer.js";
 import FillInTheBlank from "../components/FillInTheBlank.js";
 
-export default function Quiz({ context, duration }) {
+export default function Quiz({ context, duration, node}) {
   const [isDone, setIsDone] = useState(false);
 
+    console.debug(node)
   let body;
   if (isDone) {
+    // test getting reference to firstNode
+      const urls = node.url;
     body = (
       <vstack>
-        <text>Next node</text>
+          <text>{ urls }</text>
       </vstack>
     );
   } else {
     body = (
-      <FillInTheBlank
-        context={context}
-        question={"QUestion"}
-        answer={"Hello"}
-        isDone={setIsDone}
-      />
+        <button onPress={() => setIsDone(true) }>
+            Done
+        </button>
     );
   }
 
   return (
     <vstack alignment="center middle" padding="medium">
-      <Timer duration={duration} />
       {body}
     </vstack>
   );
