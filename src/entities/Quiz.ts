@@ -5,7 +5,7 @@ import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
 import { RuleQuiz, calculatePointWithTime, clearMaxCompletedPoint } from "./Rules";
 
-import { StateQuiz } from "./enums/State.js";
+import { StateQuiz } from "./enums/State";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 
@@ -19,6 +19,7 @@ export class Quiz {
 	public startTime: Date | null = null;
 	public endTime: Date | null = null;
 	public isFinal: boolean = false
+	public questAgg: IQuestionAgg 
 
 	constructor(
 		public level: Level,
@@ -28,6 +29,45 @@ export class Quiz {
 	) {
 		this.id = uuidv4();
 		this.rule = new RuleQuiz(this.level)
+		this.createQuestion(this.type)
+	}
+
+	public createQuestion(type: QuizType) {
+		switch (type) {
+			case QuizType.FILL_BLANK:
+				const words = this.info.content.split(' ');
+
+				const randomIndex = Math.floor(Math.random() * words.length);
+				this.correctAnswer = words[randomIndex];
+				words[randomIndex] = "___";
+				this.questAgg = {
+					question: words.join(' '),
+					options: []
+				} as IQuestionAgg
+
+				break;
+			case QuizType.MULTIPLE_CHOICE:
+				this.correctAnswer = this.info.author;
+				let question = "Who is author of this comment: \n";
+				question += this.info.content;
+				const options = [
+					this.info.author,
+					...this.info.noiseAuthor
+				]
+				function __shuffleArray(array: Array<string>) {
+					for (let i = array.length - 1; i > 0; i--) {
+						const j = Math.floor(Math.random() * (i + 1));
+						[array[i], array[j]] = [array[j], array[i]];
+					}
+					return array;
+				}
+
+				this.questAgg = {
+					question: words.join(' '),
+					options: __shuffleArray(options)
+				} as IQuestionAgg
+				break;
+		}
 	}
 }
 
@@ -66,53 +106,5 @@ export function checkAnswer(quiz: Quiz, answer: string) {
 	return {
 		quiz,
 		result
-	}
-}
-
-export function createQuiz(quiz: Quiz) {
-	switch (quiz.type) {
-		case QuizType.FILL_BLANK:
-			start(quiz)
-			const words = quiz.info.content.split(' ');
-
-			const randomIndex = Math.floor(Math.random() * words.length);
-			quiz.correctAnswer = words[randomIndex];
-			words[randomIndex] = "___";
-			const questAgg =  {
-				question: words.join(' '),
-				options: []
-			} as IQuestionAgg
-
-			return {
-				quiz,
-				questAgg
-			}
-		case QuizType.MULTIPLE_CHOICE:
-			start(quiz)
-			quiz.correctAnswer = quiz.info.author;
-			let question = "Who is author of this comment: \n";
-			question += quiz.info.content;
-			const options = [
-				quiz.info.author,
-				...quiz.info.noiseAuthor
-			]
-			function __shuffleArray(array: Array<string>) {
-				for (let i = array.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1));
-					[array[i], array[j]] = [array[j], array[i]];
-				}
-				return array;
-			}
-
-			const questAggMC = {
-				question: words.join(' '),
-				options: __shuffleArray(options)
-			} as IQuestionAgg
-
-			return {
-				quiz,
-				questAgg: questAggMC
-			}
-		
 	}
 }
