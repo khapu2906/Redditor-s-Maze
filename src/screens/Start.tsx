@@ -2,6 +2,7 @@ import { Devvit, useState, useForm } from "@devvit/public-api";
 import Maze from "../entities/Maze.js";
 import { Level } from "../entities/enums/Level.js";
 import { Service } from "../service.js";
+import { Screen } from "../entities/enums/Screen.js";
 
 const difficulties = [
   { string: "Easy", value: Level.EASY },
@@ -66,9 +67,10 @@ export default function Start({
   }
 
   function onStart() {
+    console.debug("screens/Start.tsx keyword: " + keyword)
     setKeyword(keyword);
     setDifficulty(difficulty);
-    setScreen();
+    setScreen(Screen.TRANSITION);
   }
 
   const text =

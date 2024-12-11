@@ -1,37 +1,54 @@
-import { Devvit, useState, useInterval } from "@devvit/public-api";
+import { Devvit, useState, useInterval, useAsync, BaseContext } from "@devvit/public-api";
 import Maze from "../entities/Maze.js";
 import { Service } from "../service.js";
 import { Level } from "../entities/enums/Level.js";
+import {Screen} from "../entities/enums/Screen.js";
 
 export default function Transition({
+    context,
   setMaze,
-  service,
   keyword,
   difficulty,
-  startGame,
+  setScreen,
+    setStartAt
 }: {
+    context: BaseContext
     setMaze: Function;
-    service: Service;
     keyword: string;
     difficulty: Level;
-    startGame: Function;
+    setScreen: Function;
 }) {
-    const [maze, _setMaze]: [maze: Maze, _setMaze: Function] = useState(
-        service.startMaze(keyword, difficulty),
-    );
+    const { data: maze, loading, error } = useAsync(async () => await (new Service(context)).startMaze(keyword, difficulty));
+
 
     function start() {
         setMaze(maze);
-        // console.debug(maze);
-        startGame();
+        setScreen(Screen.QUIZ);
+        setStartAt(Date.now());
    }
+    if (loading) {
+        return (
+        <vstack gap="medium" alignment="center middle" height="100%">
+            <text>Building Maze...</text>
+        </vstack>);
+    }
 
-  return (
-    <vstack gap="medium" alignment="center middle" height="100%">
-      <text size="xxlarge">Ready?</text>
-      <button appearance="primary" onPress={start}>
-        Start
-      </button>
-    </vstack>
+    if (error) {
+        return (
+        <vstack gap="medium" alignment="center middle" height="100%">
+            <text>Error Getting Data!</text>
+            <button appearance="primary" onPress={() => setScreen(Screen.START)}>
+                Go Back
+            </button>
+        </vstack>);
+    }
+
+    return (
+        <vstack gap="medium" alignment="center middle" height="100%">
+            <text size="xxlarge">Ready?</text>
+            <button appearance="primary" onPress={start}>
+                Start
+            </button>
+        </vstack>
   );
 }

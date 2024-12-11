@@ -7,6 +7,9 @@ import { Service } from "./service.js";
 import Timer from "./components/Timer.js";
 import Quiz from "./screens/Quiz.js";
 import { Level } from "./entities/enums/Level.js";
+import Node from "./entities/Node.js";
+import { Screen } from "./entities/enums/Screen.js";
+import End from "./screens/End.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -38,27 +41,61 @@ Devvit.addCustomPostType({
   name: "Experience Post",
   height: "regular",
   render: (context) => {
-    const [screen, setScreen] = useState(0);
-    const {
-      data: maze,
-      loading,
-      error,
-    } = useAsync(
-      async () => await new Service(context).startMaze("gaming", Level.EASY),
-    );
-    
-    const [service, setService] = useState(null);
     const [keyword, setKeyword] = useState("");
     const [difficulty, setDifficulty] = useState(Level.EASY);
+    const [screen, setScreen] = useState(Screen.START);
+    const [maze, setMaze] = useState(null);
+    const [startAt, setStartAt] = useState(-1);
+    const [endAt, setEndAt] = useState(999);
+    const [state, setState] = useState({
+      keyword: "",
+      screen: Screen.START,
+      maze: null,
+      startAt: new Date().getTime(),
+      endAt: new Date().getTime(),
+    });
 
-    let currentScreen = loading ? (
-      <text>Loading maze</text>
-    ) : (
-      <Quiz context={context} duration={10000} node={maze} />
-    );
+    console.debug("main.tsx screen " + screen);
 
-    if (error) {
-      currentScreen = <text>Error getting subreddit</text>;
+    let currentScreen;
+    switch (screen) {
+      case Screen.TRANSITION:
+        currentScreen = (
+          <Transition
+            context={context}
+            setMaze={setMaze}
+            keyword={keyword}
+            difficulty={difficulty}
+            setScreen={setScreen}
+            setStartAt={setStartAt}
+          />
+        );
+        break;
+      case Screen.QUIZ:
+        currentScreen = (
+          <Quiz
+            context={context}
+            duration={10000}
+            node={maze.nodes[0]}
+            setEndAt={setEndAt}
+            setScreen={setScreen}
+          />
+        );
+        break;
+      case Screen.END:
+            currentScreen = (
+                <End startAt={startAt} endAt={endAt} />
+                );
+        break;
+      default:
+        currentScreen = (
+          <Start
+            context={context}
+            setKeyword={setKeyword}
+            setDifficulty={setDifficulty}
+            setScreen={setScreen}
+          />
+        );
     }
 
     return <blocks>{currentScreen}</blocks>;
