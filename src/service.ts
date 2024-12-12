@@ -57,15 +57,23 @@ export class Service {
 			const node = maze.createNode(posts[i].url)
 			const commends = await posts[i].comments.all()
 			const quizSizeInNode = Math.floor(Math.random() * (3 - 1 + 1) + 1)
-			for (let i = 0; i < quizSizeInNode; i ++ ) {
-				const typeQuizRandom = Math.floor(Math.random() * (2 - 1 + 1) + 1)
-
+			let c = 0
+			let extra = 0
+			while (c < quizSizeInNode + extra && commends[c]) {
 				const info: IExtendInfo = {
-					content: commends[i].body,
-					author: commends[i].authorName,
-					url: commends[i].url,
+					content: commends[c].body,
+					author: commends[c].authorName,
+					url: commends[c].url,
 					noiseAuthor: []
 				}
+
+				c++;
+				if (this._isGifUrl(commends[c].body)) {
+					extra ++;
+					continue;
+				}
+
+				const typeQuizRandom = Math.floor(Math.random() * (2 - 1 + 1) + 1)
 
 				let typeQuiz
 				switch (typeQuizRandom) {
@@ -98,5 +106,10 @@ export class Service {
 			}
 		}
 		return selected;
+	}
+
+	private _isGifUrl(url: string) {
+		const pattern = /!\[gif\]\(giphy\|.*?\)/;
+		return pattern.test(url);
 	}
 }

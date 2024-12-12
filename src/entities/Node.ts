@@ -11,7 +11,6 @@ import { UUIDTypes, v4 as uuidv4 } from "uuid";
 import { Quiz } from "./Quiz";
 
 export class Node {
-	public readonly id: UUIDTypes;
 	public completedPoint: number = 0;
 
 	public rule: IRule;
@@ -26,9 +25,7 @@ export class Node {
 	constructor(
 		public level: Level,
 		public url: string,
-		public readonly mazeId: UUIDTypes
 	) {
-		this.id = uuidv4();
 		this.rule = new RuleNode(this.level)
 	}
 
@@ -45,7 +42,7 @@ export class Node {
 	}
 
 	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {
-		const quiz = new Quiz(this.level, info, this.id, type)
+		const quiz = new Quiz(this.level, info, type)
 		this.quizs.push(quiz)
 
 		return quiz;

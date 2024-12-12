@@ -2,14 +2,12 @@ import { Level, LevelMaxNode } from "./enums/Level";
 import IRule from "./interfaces/IRule"
 
 import { State } from "./enums/State";
-import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 import Node from "./Node";
 import { RuleMaze, calculatePointWithTime } from "./Rules";
 
 
 export class Maze {
-	public readonly id: UUIDTypes;
 	public rule: IRule;
 	public completedPoint: number = 0;
 	public state: State = State.NOT_YET;
@@ -21,7 +19,6 @@ export class Maze {
 		public keywords: string,
 		public level: Level,
 	) {
-		this.id = uuidv4();
 		this.rule = new RuleMaze(this.level)
 	}
 
@@ -29,7 +26,7 @@ export class Maze {
 		if (this.nodes.length + 1 > LevelMaxNode[this.level]) {
 			throw new Error("Amount of Node invalid")
 		}
-		const node = new Node(this.level, url, this.id)
+		const node = new Node(this.level, url)
 		this.nodes.push(node)
 		
 		return node
