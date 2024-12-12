@@ -10,6 +10,8 @@ import { Level } from "./entities/enums/Level.js";
 import Node from "./entities/Node.js";
 import { Screen } from "./entities/enums/Screen.js";
 import End from "./screens/End.js";
+import CreateMaze from "./screens/CreateMaze.js";
+import LeaderBoard from "./screens/LeaderBoard.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -55,10 +57,17 @@ Devvit.addCustomPostType({
       endAt: new Date().getTime(),
     });
 
-    console.debug("main.tsx screen " + screen);
+    console.debug("main.tsx maze " + maze);
 
     let currentScreen;
+
     switch (screen) {
+      case Screen.CREATE_MAZE:
+        currentScreen = <CreateMaze context={context} setScreen={setScreen} />;
+        break;
+      case Screen.LEADER_BOARD:
+        currentScreen = <LeaderBoard setScreen={setScreen} />;
+        break;
       case Screen.TRANSITION:
         currentScreen = (
           <Transition
@@ -83,19 +92,10 @@ Devvit.addCustomPostType({
         );
         break;
       case Screen.END:
-            currentScreen = (
-                <End startAt={startAt} endAt={endAt} />
-                );
+        currentScreen = <End startAt={startAt} endAt={endAt} />;
         break;
       default:
-        currentScreen = (
-          <Start
-            context={context}
-            setKeyword={setKeyword}
-            setDifficulty={setDifficulty}
-            setScreen={setScreen}
-          />
-        );
+        currentScreen = <Start setScreen={setScreen} context={context} setMaze={setMaze} />;
     }
 
     return <blocks>{currentScreen}</blocks>;

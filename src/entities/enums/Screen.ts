@@ -3,4 +3,6 @@ export enum Screen {
   TRANSITION,
   QUIZ,
   END,
+  CREATE_MAZE,
+  LEADER_BOARD,
 }
