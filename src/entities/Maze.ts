@@ -3,7 +3,7 @@ import IRule from "./interfaces/IRule"
 
 import { State } from "./enums/State";
 
-import Node from "./Node";
+import { Node, start as startNode } from "./Node";
 import { RuleMaze, calculatePointWithTime } from "./Rules";
 
 
@@ -33,12 +33,10 @@ export class Maze {
 	}
 } 
 
-// function 
-
 export function start(maze: Maze) {
 	maze.startTime = new Date()
 	maze = bumpUp(maze)
-	maze.nodes[0].start()
+	maze.nodes[0] = startNode(maze.nodes[0])
 	maze.state = State.WORKING;
 }
 

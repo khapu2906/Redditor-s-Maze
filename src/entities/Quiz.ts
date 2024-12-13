@@ -100,8 +100,7 @@ export function checkAnswer(quiz: Quiz, answer: string) {
 	} else {
 		quiz.state = StateQuiz.FAIL
 		quiz.endTime = new Date();
-		clearMaxCompletedPoint(quiz.rule)
-		quiz.completedPoint = quiz.rule.maxCompletedPoint
+		quiz.completedPoint = 0
 		result = false
 	}
 

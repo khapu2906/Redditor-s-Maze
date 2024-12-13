@@ -5,10 +5,10 @@ import { Level } from "./enums/Level";
 import IRule from "./interfaces/IRule"
 import { RuleNode, calculatePointWithTime } from "./Rules";
 
-import { State } from "./enums/State.js";
+import { State } from "./enums/State";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
-import { Quiz } from "./Quiz";
+import { Quiz, start as startQuiz } from "./Quiz";
 
 export class Node {
 	public completedPoint: number = 0;
