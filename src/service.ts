@@ -1,8 +1,9 @@
-import Maze from "./entities/Maze"
+import { Maze } from "./entities/Maze"
 
 import { Level, LevelMaxNode } from "./entities/enums/Level";
 import { QuizType } from "./entities/enums/QuizType";
 import { IExtendInfo } from "./entities/interfaces/IQuiz";
+import { User } from "./entities/User";
 
 const redditUsernames: Array<string> = [
 	"FunnyToast42",

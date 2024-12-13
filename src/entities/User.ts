@@ -1,21 +1,10 @@
-import { Level, LevelMaxNode } from "./enums/Level";
-import IRule from "./interfaces/IRule"
-
-import { State } from "./enums/State";
-
-import Node from "./Node";
-import { RuleMaze, calculatePointWithTime } from "./Rules";
-
+import Maze from "./Maze";
 
 export class User {
 	constructor(
+		public id: string,
+		public postPlayId: string,
+		public maze: Maze
 	) {
 	}
-
-	
 }
-
-// function 
-
-
-export default User;

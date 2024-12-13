@@ -75,6 +75,3 @@ export function end(maze: Maze) {
 	calculatePointWithTime(maze.rule, completedTime)
 	maze.completedPoint += maze.rule.maxCompletedPoint ?? 0;
 }
-
-
-export default Maze;

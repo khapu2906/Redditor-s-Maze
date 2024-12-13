@@ -74,5 +74,3 @@ export function end(node: Node) {
 
 	return node;
 }
-
-export default Node;
