@@ -43,21 +43,10 @@ Devvit.addCustomPostType({
   name: "Experience Post",
   height: "regular",
   render: (context) => {
-    const [keyword, setKeyword] = useState("");
-    const [difficulty, setDifficulty] = useState(Level.EASY);
     const [screen, setScreen] = useState(Screen.START);
     const [maze, setMaze] = useState(null);
     const [startAt, setStartAt] = useState(-1);
     const [endAt, setEndAt] = useState(999);
-    const [state, setState] = useState({
-      keyword: "",
-      screen: Screen.START,
-      maze: null,
-      startAt: new Date().getTime(),
-      endAt: new Date().getTime(),
-    });
-
-    console.debug("main.tsx maze " + maze);
 
     let currentScreen;
 
@@ -73,8 +62,6 @@ Devvit.addCustomPostType({
           <Transition
             context={context}
             setMaze={setMaze}
-            keyword={keyword}
-            difficulty={difficulty}
             setScreen={setScreen}
             setStartAt={setStartAt}
           />
@@ -84,18 +71,21 @@ Devvit.addCustomPostType({
         currentScreen = (
           <Quiz
             context={context}
-            duration={10000}
-            node={maze.nodes[0]}
+            maze={maze}
             setEndAt={setEndAt}
             setScreen={setScreen}
           />
         );
         break;
       case Screen.END:
-        currentScreen = <End startAt={startAt} endAt={endAt} />;
+        currentScreen = (
+          <End startAt={startAt} endAt={endAt} setScreen={setScreen} />
+        );
         break;
       default:
-        currentScreen = <Start setScreen={setScreen} context={context} setMaze={setMaze} />;
+        currentScreen = (
+          <Start setScreen={setScreen} context={context} setMaze={setMaze} />
+        );
     }
 
     return <blocks>{currentScreen}</blocks>;
