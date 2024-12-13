@@ -2,12 +2,12 @@
 import { Devvit, useAsync, useState } from "@devvit/public-api";
 import Start from "./screens/Start.js";
 import Transition from "./screens/Transition.js";
-import Maze from "./entities/Maze.js";
+import { Maze } from "./entities/Maze.js";
 import { Service } from "./service.js";
 import Timer from "./components/Timer.js";
 import Quiz from "./screens/Quiz.js";
 import { Level } from "./entities/enums/Level.js";
-import Node from "./entities/Node.js";
+import { Node } from "./entities/Node.js";
 import { Screen } from "./entities/enums/Screen.js";
 import End from "./screens/End.js";
 import CreateMaze from "./screens/CreateMaze.js";
@@ -15,6 +15,7 @@ import LeaderBoard from "./screens/LeaderBoard.js";
 
 Devvit.configure({
   redditAPI: true,
+  redis: true,
 });
 
 // Add a menu item to the subreddit menu for instantiating the new experience post
