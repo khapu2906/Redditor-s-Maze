@@ -6,7 +6,6 @@ import IRule from "./interfaces/IRule"
 import { RuleNode, calculatePointWithTime } from "./Rules";
 
 import { State } from "./enums/State";
-import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 import { Quiz, start as startQuiz } from "./Quiz";
 

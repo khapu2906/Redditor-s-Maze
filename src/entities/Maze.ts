@@ -5,8 +5,7 @@ import { State } from "./enums/State";
 
 import { Node, start as startNode } from "./Node";
 import { RuleMaze, calculatePointWithTime } from "./Rules";
-
-
+import { User } from "./User"
 export class Maze {
 	public rule: IRule;
 	public completedPoint: number = 0;
@@ -16,8 +15,10 @@ export class Maze {
 	public nodes: Array<Node> = []
 
 	constructor(
+		public id: string,
 		public keywords: string,
 		public level: Level,
+		public user: User,
 	) {
 		this.rule = new RuleMaze(this.level)
 	}

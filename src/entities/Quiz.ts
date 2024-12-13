@@ -6,7 +6,6 @@ import IRule from "./interfaces/IRule"
 import { RuleQuiz, calculatePointWithTime, clearMaxCompletedPoint } from "./Rules";
 
 import { StateQuiz } from "./enums/State";
-import INode from "./interfaces/INode"
 
 export class Quiz {
 	public rule: IRule;
