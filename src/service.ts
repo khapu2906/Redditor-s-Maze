@@ -1,4 +1,4 @@
-import { Maze } from "./entities/Maze"
+import { Maze, bumpUp } from "./entities/Maze"
 
 import { Level, LevelMaxNode } from "./entities/enums/Level";
 import { QuizType } from "./entities/enums/QuizType";
@@ -43,7 +43,7 @@ export class Service {
 
 	async startMaze(kw: string, level: Level): Maze {
 		// start maze
-		const maze = new Maze(kw, level)
+		let maze = new Maze(kw, level)
 		const posts: Array<any> = await this.context.reddit.getHotPosts({
 			subredditName: kw,
 			timeframe: 'day',
@@ -90,6 +90,7 @@ export class Service {
 				node.createQuiz(info, typeQuiz)
 			}
 		}
+		maze = bumpUp(maze)
 
 		return maze;
 	}

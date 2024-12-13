@@ -35,7 +35,6 @@ export class Maze {
 
 export function start(maze: Maze) {
 	maze.startTime = new Date()
-	maze = bumpUp(maze)
 	maze.nodes[0] = startNode(maze.nodes[0])
 	maze.state = State.WORKING;
 }
