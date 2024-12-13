@@ -2,6 +2,7 @@ import { Devvit, useForm, useState } from "@devvit/public-api";
 import { Level } from "../entities/enums/Level.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
+import { Service } from "../service.js";
 
 const difficulties = [
   { string: "Easy", value: Level.EASY },
@@ -17,7 +18,7 @@ const keywords = [
 ];
 
 export default function CreateMaze({ context, setScreen }) {
-  const [keyword, setKeyword] = useState("");
+  const [subreddit, setSubreddit] = useState("");
   const [difficulty, setDifficulty] = useState(Level.EASY);
 
   const difficultyForm = useForm(
@@ -49,7 +50,7 @@ export default function CreateMaze({ context, setScreen }) {
         },
       ],
     },
-    (values) => setKeyword(values.keyword[0]),
+    (values) => setSubreddit(values.keyword[0]),
   );
 
   function showKeywordsForm() {
@@ -60,26 +61,27 @@ export default function CreateMaze({ context, setScreen }) {
     context.ui.showForm(difficultyForm);
   }
 
-  function onStart() {
-    console.debug("screens/Start.tsx keyword: " + keyword);
-    setKeyword(keyword);
-    setDifficulty(difficulty);
-    setScreen(Screen.TRANSITION);
+  async function onCreate() {
+      context.ui.showToast({text: "Creating Maze...", appearance: "neutral"});
+      console.debug("screens/Start.tsx keyword: " + subreddit);
+      const service = new Service(context);
+      await service.configMaze(subreddit, difficulty);
+      context.ui.showToast({text: "Maze Created!", appearance: "success"});
   }
 
   const text =
-    keyword == "" ? (
-      <text color="neutral-content-weak">Keyword</text>
+    subreddit == "" ? (
+      <text color="neutral-content-weak">Subreddit</text>
     ) : (
-      <text>{keyword}</text>
+      <text>{subreddit}</text>
     );
 
   const button =
-    keyword == "" ? (
+    subreddit == "" ? (
       // disable button if no keywore entered
-      <button appearance="secondary">Create</button>
+        <button icon="upload-fill" appearance="secondary">Create</button>
     ) : (
-      <button appearance="primary" onPress={onStart}>
+      <button icon="upload-fill" appearance="primary" onPress={onCreate}>
         Create
       </button>
     );
@@ -89,20 +91,23 @@ export default function CreateMaze({ context, setScreen }) {
   ).string;
 
   return (
-    <vstack height="100%" width="100%" alignment="center">
+    <vstack height="100%" width="100%" alignment="center" gap="medium">
       <BackScreen screen={Screen.START} setScreen={setScreen} />
 
-      <vstack height="100%" gap="medium" alignment="center">
-        <hstack gap="medium" alignment="middle center">
+      <vstack gap="medium" alignment="center">
+        <hstack alignment="middle" minWidth="200px">
           {text}
+          <spacer size="medium" grow />
           <button icon="topic-programming" onPress={showKeywordsForm}></button>
         </hstack>
-        <hstack gap="medium" alignment="middle center">
+        <hstack alignment="middle" minWidth="200px">
           <text>Difficulty: {difficultyText}</text>
+          <spacer size="medium" grow />
           <button icon="caret-down" onPress={showDifficultyForm}></button>
         </hstack>
-        {button}
       </vstack>
+
+      {button}
     </vstack>
   );
 }

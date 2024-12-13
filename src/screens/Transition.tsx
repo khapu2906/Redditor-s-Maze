@@ -1,10 +1,5 @@
-import {
-  Devvit,
-  useAsync,
-  ContextAPIClients,
-} from "@devvit/public-api";
+import { Devvit, useAsync, ContextAPIClients } from "@devvit/public-api";
 import { Service } from "../service.js";
-import { Level } from "../entities/enums/Level.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
 
@@ -23,9 +18,10 @@ export default function Transition({
     data: maze,
     loading,
     error,
-  } = useAsync(async () =>
-    loadMaze({ context, keyword: "memes", difficulty: Level.MEDIUM }),
-  );
+  } = useAsync(async function () {
+    const service = new Service(context);
+    return await service.loadMaze();
+  });
 
   function start() {
     setMaze(maze);
@@ -68,17 +64,4 @@ export default function Transition({
       {body}
     </vstack>
   );
-}
-
-async function loadMaze({
-  context,
-  keyword,
-  difficulty,
-}: {
-  context: ContextAPIClients;
-  keyword: string;
-  difficulty: Level;
-}) {
-  const service = new Service(context);
-  return await service.startMaze(keyword, difficulty);
 }

@@ -3,7 +3,7 @@ import Timer from "../components/Timer.js";
 import FillInTheBlank from "../components/FillInTheBlank.js";
 import { Node, start as startNode, end as endNode } from "../entities/Node.js";
 import { Screen } from "../entities/enums/Screen.js";
-import Maze from "../entities/Maze.js";
+import { Maze } from "../entities/Maze.js";
 
 export default function Quiz({
   context,
@@ -17,9 +17,8 @@ export default function Quiz({
   setEndAt: Function;
 }) {
   const [isDone, setIsDone] = useState(false);
-  const [nodeIndex, setNodeIndex] = useState(0);
+  const [node, setNode] = useState(maze.nodes[0]);
 
-  const node = maze.nodes[nodeIndex];
 
   startNode(node);
 
@@ -27,7 +26,7 @@ export default function Quiz({
     endNode(node);
 
     // current node is final
-    if (nodeIndex >= maze.nodes.length - 1) {
+    if (0 == node.nextNodes.length) {
       setEndAt(Date.now());
       setScreen(Screen.END);
     } else {
@@ -35,26 +34,16 @@ export default function Quiz({
     }
   }
 
-  function getNextIndices(from: number, count: number) {
-    const temp = [];
-
-    for (let i = from; i < maze.nodes.length && count > 0; i++) {
-      temp.push(i);
-      count--;
-    }
-
-    return temp;
-  }
   let body;
   if (isDone) {
-    const nextNodes = getNextIndices(nodeIndex + 1, 3).map((index) => (
+    const nextNodes = node.nextNodes().map((node : Node) => (
       <button
         onPress={() => {
           setIsDone(false);
-          setNodeIndex(index);
+          setNode(node);
         }}
       >
-        Node {index}
+        Node {node.url}
       </button>
     ));
     body = (
@@ -67,7 +56,7 @@ export default function Quiz({
     const quiz = node.quizs[0];
     body = (
       <vstack gap="medium">
-        <text>Node: {nodeIndex}</text>
+        <text>Node: {node.url}</text>
         <text>Question: {quiz.id}</text>
         <text>Correct Answer: {quiz.correctAnswer}</text>
         <button onPress={onAnswer}>Answer</button>

@@ -14,10 +14,10 @@ export default function Start({ context, setScreen, setMaze }) {
       >
         Start
       </button>
-      <button minWidth="200px" onPress={() => setScreen(Screen.CREATE_MAZE)}>
+      <button icon="edit-outline" minWidth="200px" onPress={() => setScreen(Screen.CREATE_MAZE)}>
         Create Maze
       </button>
-      <button minWidth="200px" onPress={() => setScreen(Screen.LEADER_BOARD)}>
+      <button icon="world-outline" minWidth="200px" onPress={() => setScreen(Screen.LEADER_BOARD)}>
         Leader Board
       </button>
     </vstack>

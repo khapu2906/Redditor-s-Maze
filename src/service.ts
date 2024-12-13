@@ -48,12 +48,10 @@ export class Service {
 		}))
 	}
 
-	async startMaze(): Maze {
+	async loadMaze(): Maze {
 		try {
 			const keyWord = `postPlay:${this.context.postId}`;
-
 			const mazeConfig = await this.context.redis.get(keyWord)
-
 			const { kw, level } = JSON.parse(mazeConfig)
 			// start maze
 			const user = new User(
@@ -64,29 +62,35 @@ export class Service {
 			const posts: Array<any> = await this.context.reddit.getHotPosts({
 				subredditName: kw,
 				timeframe: 'day',
-				limit: 10,
-				pageSize: 10,
+				limit: LevelMaxNode[level],
+				pageSize: LevelMaxNode[level],
 			}).all();
 
-			for (let i = 0; i < LevelMaxNode[level]; i++) {
-				if (!posts[i]) {
-					break;
-				}
-				const node = maze.createNode(posts[i].url)
-				const commends = await posts[i].comments.all()
-				const quizSizeInNode = Math.floor(Math.random() * (3 - 1 + 1) + 1)
-				let c = 0
-				let extra = 0
-				while (c < quizSizeInNode + extra && commends[c]) {
-					const info: IExtendInfo = {
-						content: commends[c].body,
-						author: commends[c].authorName,
-						url: commends[c].url,
-						noiseAuthor: []
+        console.debug("service.ts posts " + posts.length);
+
+			  for (let i = 0; i < LevelMaxNode[level]; i++) {
+				    if (!posts[i]) {
+					      break;
+				    }
+            const commentCount = 3;
+				    const node = maze.createNode(posts[i].url)
+				    const comments = await posts[i].comments.get(commentCount)
+
+            console.debug("service.ts comments " + comments.length);
+
+				    const quizSizeInNode = Math.floor(Math.random() * (commentCount - 1) + 1)
+				    let c = 0
+				    let extra = 0
+				    while (c < quizSizeInNode + extra && comments[c]) {
+					      const info: IExtendInfo = {
+						        content: comments[c].body,
+						        author: comments[c].authorName,
+						        url: comments[c].url,
+						        noiseAuthor: []
 					}
 
 					c++;
-					if (this._isGifUrl(commends[c].body)) {
+					if (this._isGifUrl(comments[c].body)) {
 						extra++;
 						continue;
 					}
@@ -100,22 +104,21 @@ export class Service {
 							break;
 						default:
 							typeQuiz = QuizType.MULTIPLE_CHOICE
-							info.noiseAuthor = await this.__getRandomUsernames(redditUsernames)
+							info.noiseAuthor = this.__getRandomUsernames(redditUsernames)
 							break;
 					}
 
 					node.createQuiz(info, typeQuiz)
 				}
 			}
-			maze = bumpUp(maze)
 
-			return maze;
+			return bumpUp(maze)
 		} catch(error) {
 			console.error(error)
 		}
 	}
 
-	private async __getRandomUsernames(usernames: Array<string>) {
+	private __getRandomUsernames(usernames: Array<string>) {
 		const count = Math.floor(Math.random() * 3) + 1;
 		const selected: Array<string> = [];
 
