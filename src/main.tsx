@@ -46,8 +46,6 @@ Devvit.addCustomPostType({
   render: (context) => {
     const [screen, setScreen] = useState(Screen.START);
     const [maze, setMaze] = useState(null);
-    const [startAt] = useState(-1);
-    const [endAt, setEndAt] = useState(999);
     const [quizIndex, setQuizIndex] = useState(0);
     const [nodeIndex, setNodeIndex] = useState(0);
 
@@ -57,7 +55,7 @@ Devvit.addCustomPostType({
       case Screen.SELECT_NODE:
         currentScreen = (
           <SelectNode
-            node={nodeIndex}
+            nodeIndex={nodeIndex}
             maze={maze}
             setNodeIndex={setNodeIndex}
             setQuizIndex={setQuizIndex}
@@ -82,7 +80,7 @@ Devvit.addCustomPostType({
         currentScreen = <CreateMaze context={context} setScreen={setScreen} />;
         break;
       case Screen.LEADER_BOARD:
-        currentScreen = <LeaderBoard setScreen={setScreen} />;
+        currentScreen = <LeaderBoard context={context} setScreen={setScreen} />;
         break;
       case Screen.TRANSITION:
         currentScreen = (
@@ -99,7 +97,7 @@ Devvit.addCustomPostType({
             context={context}
             nodeIndex={nodeIndex}
             quizIndex={quizIndex}
-            setScreen={setScreen}
+           setScreen={setScreen}
             maze={maze}
             setMaze={setMaze}
             setNodeIndex={setNodeIndex}
@@ -108,7 +106,7 @@ Devvit.addCustomPostType({
         break;
       case Screen.END:
         currentScreen = (
-          <End startAt={startAt} endAt={endAt} setScreen={setScreen} />
+          <End  setScreen={setScreen} maze={ maze } context={context} />
         );
         break;
       default:

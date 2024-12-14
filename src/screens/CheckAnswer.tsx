@@ -1,7 +1,7 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
 import { Node, end as endNode } from "../entities/Node.js";
 import Answer from "../components/Answer.js";
-import { Maze, bumpUp, getNodeIndices } from "../entities/Maze.js";
+import { Maze, bumpUp, getNodeIndices, end as endMaze } from "../entities/Maze.js";
 import { Screen } from "../entities/enums/Screen.js";
 import NextNodes from "../components/NextNodes.js";
 import { Quiz } from "../entities/Quiz.js";
@@ -41,7 +41,9 @@ export default function CheckAnswer({
     action =
       node.url == maze.nodes.at(-1).url ? (
         // last node of maze
-        <button appearance="primary" onPress={() => setScreen(Screen.END)}>
+        <button appearance="primary" onPress={async () => {
+            setMaze(endMaze(maze))
+            setScreen(Screen.END)}}>
           Finish!
         </button>
       ) : (

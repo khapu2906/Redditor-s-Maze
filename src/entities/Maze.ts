@@ -74,6 +74,8 @@ export function end(maze: Maze) {
   }
   calculatePointWithTime(maze.rule, completedTime);
   maze.completedPoint += maze.rule.maxCompletedPoint ?? 0;
+
+    return maze;
 }
 
 export function getNodeIndices({

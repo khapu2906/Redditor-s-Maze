@@ -8,7 +8,7 @@ export default function ScoreBoard({
   scores: number[];
 }) {
   return (
-    <hstack gap="medium" width="100%">
+    <hstack gap="medium" width="100%" alignment="middle center">
       <vstack height="100%" width="70%" alignment="center">
         {usernames.map((name) => (
           <text>{name}</text>

@@ -5,18 +5,19 @@ import NextNodes from "../components/NextNodes.js";
 import { Screen } from "../entities/enums/Screen.js";
 
 export default function SelectNode({
-  node,
+  nodeIndex,
   maze,
   setScreen,
   setNodeIndex,
   setQuizIndex,
 }: {
-  node: Node;
+  nodeIndex: number;
   maze: Maze;
   setNodeIndex: Dispatch<number>;
   setQuizIndex: Dispatch<number>;
   setScreen: Dispatch<Screen>;
 }) {
+    const node = maze.nodes.at(nodeIndex)
   const nextIndices = getNodeIndices({maze, nodes: bumpUp(node, maze)})
 
   return (
