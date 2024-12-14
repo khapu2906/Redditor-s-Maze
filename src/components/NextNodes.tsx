@@ -1,25 +1,36 @@
-import { Devvit, useState, BaseContext } from "@devvit/public-api";
-import { Node, start as startNode, end as endNode } from "../entities/Node.js";
+import { Devvit, Dispatch } from "@devvit/public-api";
+import { Screen } from "../entities/enums/Screen.js";
+import { Maze } from "../entities/Maze.js";
 
 export default function NextNodes({
-  nodes,
-  setNode,
+  maze,
+  nodeIndices,
+  setNodeIndex,
   setQuizIndex,
+  setScreen,
 }: {
-  nodes: Node[];
-  setNode: Function;
+  maze: Maze;
+  nodeIndices: number[];
+  setNodeIndex: Function;
   setQuizIndex: Function;
+  setScreen: Dispatch<Screen>;
 }) {
-  const nextNodes = nodes.map((node: Node) => (
-    <button
-      onPress={() => {
-        setNode(node);
-        setQuizIndex(0);
-      }}
-    >
-      Node {node.url}
-    </button>
-  ));
+  const nextNodes = nodeIndices.map((index) => {
+    return (
+      <button
+        onPress={() => {
+          const screen =
+            0 != maze.nodes[index].endTime ? Screen.SELECT_NODE : Screen.QUIZ;
+
+          setScreen(screen);
+          setNodeIndex(index);
+          setQuizIndex(0);
+        }}
+      >
+        Node {index}
+      </button>
+    );
+  });
 
   return (
     <vstack gap="medium">

@@ -9,6 +9,9 @@ import End from "./screens/End.js";
 import CreateMaze from "./screens/CreateMaze.js";
 import LeaderBoard from "./screens/LeaderBoard.js";
 import { bumpUp } from "./entities/Maze.js";
+import Answer from "./components/CheckAnswer.js";
+import CheckAnswer from "./screens/CheckAnswer.js";
+import SelectNode from "./screens/SelectNode.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -43,12 +46,38 @@ Devvit.addCustomPostType({
   render: (context) => {
     const [screen, setScreen] = useState(Screen.START);
     const [maze, setMaze] = useState(null);
-    const [startAt, setStartAt] = useState(-1);
+    const [startAt] = useState(-1);
     const [endAt, setEndAt] = useState(999);
+    const [quizIndex, setQuizIndex] = useState(0);
+    const [nodeIndex, setNodeIndex] = useState(0);
 
     let currentScreen;
 
     switch (screen) {
+      case Screen.SELECT_NODE:
+        currentScreen = (
+          <SelectNode
+            node={nodeIndex}
+            maze={maze}
+            setNodeIndex={setNodeIndex}
+            setQuizIndex={setQuizIndex}
+            setScreen={setScreen}
+          />
+        );
+        break;
+      case Screen.CHECK_ANSWER:
+        currentScreen = (
+          <CheckAnswer
+            quizIndex={quizIndex}
+            setQuizIndex={setQuizIndex}
+            setScreen={setScreen}
+            maze={maze}
+            setMaze={setMaze}
+            nodeIndex={nodeIndex}
+            setNodeIndex={setNodeIndex}
+          />
+        );
+        break;
       case Screen.CREATE_MAZE:
         currentScreen = <CreateMaze context={context} setScreen={setScreen} />;
         break;
@@ -68,9 +97,12 @@ Devvit.addCustomPostType({
         currentScreen = (
           <Quiz
             context={context}
-            maze={maze}
-            setEndAt={setEndAt}
+            nodeIndex={nodeIndex}
+            quizIndex={quizIndex}
             setScreen={setScreen}
+            maze={maze}
+            setMaze={setMaze}
+            setNodeIndex={setNodeIndex}
           />
         );
         break;

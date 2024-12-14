@@ -5,4 +5,6 @@ export enum Screen {
   END,
   CREATE_MAZE,
   LEADER_BOARD,
+  CHECK_ANSWER,
+  SELECT_NODE,
 }

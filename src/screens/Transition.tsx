@@ -1,7 +1,8 @@
-import { Devvit, useAsync, ContextAPIClients } from "@devvit/public-api";
+import { Devvit, useAsync, ContextAPIClients, Dispatch } from "@devvit/public-api";
 import { Service } from "../service.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
+import { Maze, start as startMaze} from "../entities/Maze.js";
 
 export default function Transition({
   context,
@@ -9,8 +10,8 @@ export default function Transition({
   setScreen,
 }: {
   context: ContextAPIClients;
-  setMaze: Function;
-  setScreen: Function;
+  setMaze: Dispatch<Maze>;
+  setScreen: Dispatch<Screen>;
 }) {
   const {
     data: maze,
@@ -22,7 +23,7 @@ export default function Transition({
   });
 
     function onStart() {
-        setMaze(maze);
+        setMaze(startMaze(maze));
         setScreen(Screen.QUIZ);
     }
 

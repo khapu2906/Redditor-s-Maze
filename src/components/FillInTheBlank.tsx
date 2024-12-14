@@ -28,7 +28,7 @@ context: ContextAPIClients,
         },
       ],
     },
-    (values) => setAnswer(values.keyword),
+    (values) => setAnswer(values.keyword?.replaceAll(" ", "")),
   );
 
   return (
