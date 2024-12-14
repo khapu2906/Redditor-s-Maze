@@ -41,7 +41,7 @@ export function start(maze: Maze) {
 }
 
 export async function bumpUp(currentNode: Node, maze: Maze) {
-	if (currentNode === maze.nodes[maze.nodes.length - 1]) {
+	if (currentNode == maze.nodes[maze.nodes.length - 1]) {
 		currentNode.isFinal = true
 	
 		return []
