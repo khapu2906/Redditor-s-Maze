@@ -1,41 +1,53 @@
-import { useState, Devvit, useForm } from "@devvit/public-api";
+import { useState, Devvit, useForm, ContextAPIClients } from "@devvit/public-api";
 
-function FillInTheBlank({ context, question, answer, isDone }) {
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+export default function FillInTheBlank({ context, question, onAnswer }: {
+context: ContextAPIClients,
+    question: string,
+    onAnswer: Function
+}) {
+  const [answer, setAnswer] = useState("");
 
-    function checkAnswer(values) {
-        isDone(
-            values.answer.trim().toLowerCase() === answer.toLowerCase(),
-        );
-    }
-
-    const form = useForm(
-        {
-            fields: [{ type: "string", name: "answer", label: "Answer" }],
-        },
-        checkAnswer,
-    );
-
-    function showForm() {
-        context.ui.showForm(form);
-    }
-
-    return (
-        <vstack gap="medium" alignment="center middle">
-            <text size="large">Fill in the blank:</text>
-            <text size="medium">{question}</text>
-
-      <button appearance="primary" onPress={showForm}>
+  const button =
+    "" == answer ? (
+      <button appearance="primary" disabled>
         Answer
       </button>
+    ) : (
+      <button appearance="primary" onPress={() => onAnswer(answer)}>
+        Answer
+      </button>
+    );
 
-      {isCorrect !== null && (
-        <text size="medium" color={isCorrect ? "green" : "red"}>
-          {isCorrect ? "Correct!" : "Try again."}
-        </text>
-      )}
+  const form = useForm(
+    {
+      fields: [
+        {
+          type: "string",
+          name: "keyword",
+          label: "Keyword",
+        },
+      ],
+    },
+    (values) => setAnswer(values.keyword?.replaceAll(" ", "")),
+  );
+
+  return (
+    <vstack alignment="middle center" gap="medium" width="100%">
+      <text>Fill In The Blank</text>
+      <text width="70%" wrap={true}>
+        Question: {question}
+      </text>
+
+      <hstack minWidth="200px" alignment="middle">
+        <text>Keyword: {answer}</text>
+        <spacer grow />
+        <button
+          icon="topic-programming-outline"
+          onPress={() => context.ui.showForm(form)}
+        />
+      </hstack>
+
+      {button}
     </vstack>
   );
 }
-
-export default FillInTheBlank;

@@ -1,18 +1,17 @@
-import { Devvit, useAsync, ContextAPIClients } from "@devvit/public-api";
+import { Devvit, useAsync, ContextAPIClients, Dispatch } from "@devvit/public-api";
 import { Service } from "../service.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
+import { Maze, start as startMaze} from "../entities/Maze.js";
 
 export default function Transition({
   context,
   setMaze,
   setScreen,
-  setStartAt,
 }: {
   context: ContextAPIClients;
-  setMaze: Function;
-  setScreen: Function;
-  setStartAt: Function;
+  setMaze: Dispatch<Maze>;
+  setScreen: Dispatch<Screen>;
 }) {
   const {
     data: maze,
@@ -20,46 +19,41 @@ export default function Transition({
     error,
   } = useAsync(async function () {
     const service = new Service(context);
-    const maze = await service.loadMaze();
-    console.log(maze)
-    return maze
+    return await service.loadMaze();
   });
 
-  console.log(maze, loading)
+    function onStart() {
+        setMaze(startMaze(maze));
+        setScreen(Screen.QUIZ);
+    }
 
-  function start() {
-    setMaze(maze);
-    setScreen(Screen.QUIZ);
-    setStartAt(Date.now());
-  }
-
-  let body = (
-    <vstack height="100%" gap="medium" alignment="center">
-      <text size="xxlarge">Ready?</text>
-      <button appearance="primary" onPress={start}>
-        Start
-      </button>
-    </vstack>
-  );
-
-  if (loading) {
-    body = (
-      <vstack alignment="center" height="100%">
-        <text>Building Maze...</text>
-      </vstack>
+    let body = (
+        <vstack height="100%" gap="medium" alignment="center">
+            <text size="xxlarge">Ready?</text>
+            <button appearance="primary" onPress={onStart}>
+                Start
+            </button>
+        </vstack>
     );
-  }
 
-  if (error) {
-    body = (
-      <vstack gap="medium" alignment="center" height="100%">
-        <text>Error Getting Data!</text>
-        <button appearance="primary" onPress={() => setScreen(Screen.START)}>
-          Go Back
-        </button>
-      </vstack>
-    );
-  }
+    if (loading) {
+        body = (
+            <vstack alignment="center" height="100%">
+                <text>Building Maze...</text>
+            </vstack>
+        );
+    }
+
+    if (error) {
+        body = (
+            <vstack gap="medium" alignment="center" height="100%">
+                <text>Error Getting Data!</text>
+                <button appearance="primary" onPress={() => setScreen(Screen.START)}>
+                    Go Back
+                </button>
+            </vstack>
+        );
+    }
 
   return (
     <vstack alignment="center" height="100%" width="100%">

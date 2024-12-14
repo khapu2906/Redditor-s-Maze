@@ -1,47 +1,70 @@
-import { Devvit, useState, useForm } from "@devvit/public-api";
+import { Devvit, useState, useForm, IconName, ContextAPIClients } from "@devvit/public-api";
 
-function MultipleChoice({ context, question, options, answer }) {
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const form = useForm(
-    {
-      fields: [
-        {
-          type: "select",
-          name: "answer",
-          label: "Answer",
-          options: options.map((value) => {
-            return { label: value, value: value };
-          }),
-        },
-      ],
-    },
-    checkAnswer,
-  );
+export default function MultipleChoice({
+  context,
+  onAnswer,
+  question,
+  options,
+}:{
+context: ContextAPIClients,
+    onAnswer: Function,
+    question: string,
+    options: string[]
+}) {
+  const [answer, setAnswer] = useState("");
 
-  function checkAnswer(values) {
-    setIsCorrect(values.answer == answer);
-  }
-
-  function showForm() {
-    context.ui.showForm(form);
-  }
-
-  return (
-    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-      <text size="large">{question}</text>
-      <button
-        appearance="primary"
-        onPress={showForm}
-      >
+  const button =
+    "" == answer ? (
+      <button appearance="primary" disabled>
         Answer
       </button>
-      {isCorrect !== null && (
-        <text size="medium" color={isCorrect ? "green" : "red"}>
-          {isCorrect ? "Correct!" : "Try again."}
-        </text>
-      )}
+    ) : (
+      <button appearance="primary" onPress={() => onAnswer(answer)}>
+        Answer
+      </button>
+    );
+
+  return (
+    <vstack alignment="middle center" gap="medium" width="100%">
+      <text>Multiple choice</text>
+      <text width="70%" wrap={true}>Question: {question}</text>
+      <Options options={options} answer={answer} setAnswer={setAnswer} />
+
+      {button}
     </vstack>
   );
 }
 
-export default MultipleChoice;
+function Options({
+  options,
+  setAnswer,
+  answer,
+}: {
+  options: string[];
+  setAnswer: Function;
+  answer: string;
+}) {
+  const buttons = options.map(function (string) {
+    let icon: IconName = "radio-button-outline";
+    let appearance: Devvit.Blocks.ButtonAppearance = "plain";
+
+    if (answer == string) {
+      icon = "radio-button-fill";
+      appearance = "secondary";
+    }
+    return (
+      <button
+        icon={icon}
+        appearance={appearance}
+        onPress={() => setAnswer(string)}
+      >
+        {string}
+      </button>
+    );
+  });
+  return (
+    <vstack minWidth="300px" gap="medium">
+      {buttons}
+    </vstack>
+  );
+}

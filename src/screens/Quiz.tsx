@@ -1,72 +1,92 @@
-import { Devvit, useState, BaseContext } from "@devvit/public-api";
-import Timer from "../components/Timer.js";
+import { Devvit, ContextAPIClients, Dispatch } from "@devvit/public-api";
 import FillInTheBlank from "../components/FillInTheBlank.js";
-import { Node, start as startNode, end as endNode } from "../entities/Node.js";
+import { Node, checkQuiz, start as startNode } from "../entities/Node.js";
 import { Screen } from "../entities/enums/Screen.js";
 import { Maze } from "../entities/Maze.js";
+import { QuizType } from "../entities/enums/QuizType.js";
+import { Quiz as QuizModel, start as startQuiz } from "../entities/Quiz.js";
+import MultipleChoice from "../components/MultipleChoice.js";
 
 export default function Quiz({
   context,
-  maze,
+  nodeIndex,
+  quizIndex,
   setScreen,
-  setEndAt,
+  setMaze,
+  maze,
 }: {
-  context: BaseContext;
-  maze: Maze;
+  context: ContextAPIClients;
+  nodeIndex: number;
+  quizIndex: number;
   setScreen: Function;
-  setEndAt: Function;
+  setMaze: Dispatch<Maze>;
+  setNodeIndex: Dispatch<number>;
+  maze: Maze;
 }) {
-  const [isDone, setIsDone] = useState(false);
-  const [node, setNode] = useState(maze.nodes[0]);
-
-
-  startNode(node);
-
-  function onAnswer() {
-    endNode(node);
-
-    // current node is final
-    if (0 == node.nextNodes.length) {
-      setEndAt(Date.now());
-      setScreen(Screen.END);
-    } else {
-      setIsDone(true);
-    }
+  const node: Node = maze.nodes.at(nodeIndex);
+  const quiz: QuizModel = Object.values(node.quizs).at(quizIndex);
+  if (0 == quiz.startTime) {
+    // assign new value to quiz
+    node.quizs[quizIndex] = startQuiz(quiz);
+    // update maze to node
+    maze.nodes[nodeIndex] = node;
+    setMaze(maze);
   }
 
-  let body;
-  if (isDone) {
-    const nextNodes = node.nextNodes().map((node : Node) => (
-      <button
-        onPress={() => {
-          setIsDone(false);
-          setNode(node);
-        }}
-      >
-        Node {node.url}
-      </button>
-    ));
-    body = (
-      <vstack gap="medium">
-        <text>Next Nodes</text>
-        {nextNodes}
-      </vstack>
-    );
-  } else {
-    const quiz = node.quizs[0];
-    body = (
-      <vstack gap="medium">
-        <text>Node: {node.url}</text>
-        <text>Question: {quiz.id}</text>
-        <text>Correct Answer: {quiz.correctAnswer}</text>
-        <button onPress={onAnswer}>Answer</button>
-      </vstack>
-    );
+  if (0 == node.startTime) {
+    // find node and assign new value
+    maze.nodes[nodeIndex] = startNode(node);
+    setMaze(maze);
+  }
+
+  async function onAnswer(answer: string) {
+    maze.nodes[nodeIndex] = checkQuiz({ node, quizIndex, answer });
+      setMaze(maze);
+      setScreen(Screen.CHECK_ANSWER);
   }
 
   return (
-    <vstack gap="medium" alignment="center middle" padding="medium">
-      {body}
+    <vstack
+      gap="medium"
+      alignment="middle center"
+      padding="medium"
+      width="100%"
+      height="100%"
+    >
+      <Question context={context} quiz={quiz} onAnswer={onAnswer} />
     </vstack>
   );
+}
+
+function Question({
+  quiz,
+  onAnswer,
+  context,
+}: {
+  context: ContextAPIClients;
+  quiz: QuizModel;
+  onAnswer: Function;
+}) {
+  let body;
+  switch (quiz.type) {
+    case QuizType.FILL_BLANK:
+      body = (
+        <FillInTheBlank
+          question={quiz.questAgg.question.slice(0, 50)}
+          context={context}
+          onAnswer={onAnswer}
+        />
+      );
+      break;
+    default:
+      body = (
+        <MultipleChoice
+          question={quiz.questAgg.question.slice(0, 50)}
+          options={quiz.questAgg.options}
+          context={context}
+          onAnswer={onAnswer}
+        />
+      );
+  }
+  return body;
 }
