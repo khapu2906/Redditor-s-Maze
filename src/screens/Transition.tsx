@@ -7,12 +7,10 @@ export default function Transition({
   context,
   setMaze,
   setScreen,
-  setStartAt,
 }: {
   context: ContextAPIClients;
   setMaze: Function;
   setScreen: Function;
-  setStartAt: Function;
 }) {
   const {
     data: maze,
@@ -25,18 +23,18 @@ export default function Transition({
     return maze
   });
 
-  console.log(maze, loading)
-
-  function start() {
-    setMaze(maze);
-    setScreen(Screen.QUIZ);
-    setStartAt(Date.now());
-  }
+  console.debug("Screens/Transition.tsx maze 24 ", maze);
 
   let body = (
     <vstack height="100%" gap="medium" alignment="center">
       <text size="xxlarge">Ready?</text>
-      <button appearance="primary" onPress={start}>
+      <button
+        appearance="primary"
+        onPress={async function () {
+          setMaze(maze);
+          setScreen(Screen.QUIZ);
+        }}
+      >
         Start
       </button>
     </vstack>

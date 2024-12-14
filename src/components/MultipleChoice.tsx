@@ -1,47 +1,14 @@
 import { Devvit, useState, useForm } from "@devvit/public-api";
 
-function MultipleChoice({ context, question, options, answer }) {
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const form = useForm(
-    {
-      fields: [
-        {
-          type: "select",
-          name: "answer",
-          label: "Answer",
-          options: options.map((value) => {
-            return { label: value, value: value };
-          }),
-        },
-      ],
-    },
-    checkAnswer,
-  );
-
-  function checkAnswer(values) {
-    setIsCorrect(values.answer == answer);
-  }
-
-  function showForm() {
-    context.ui.showForm(form);
-  }
+export default function MultipleChoice({ context, onAnswer }) {
+  const [answer, setAnswer] = useState("");
 
   return (
-    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-      <text size="large">{question}</text>
-      <button
-        appearance="primary"
-        onPress={showForm}
-      >
+    <vstack alignment="center" gap="medium">
+      <text>Multiple choice</text>
+      <button appearance="primary" disabled={"" == answer } onPress={onAnswer}>
         Answer
       </button>
-      {isCorrect !== null && (
-        <text size="medium" color={isCorrect ? "green" : "red"}>
-          {isCorrect ? "Correct!" : "Try again."}
-        </text>
-      )}
     </vstack>
   );
 }
-
-export default MultipleChoice;

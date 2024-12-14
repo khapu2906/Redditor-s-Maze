@@ -1,9 +1,18 @@
-import { Devvit, useState, BaseContext } from "@devvit/public-api";
+import {
+  Devvit,
+  useState,
+  BaseContext,
+  ContextAPIClients,
+} from "@devvit/public-api";
 import Timer from "../components/Timer.js";
 import FillInTheBlank from "../components/FillInTheBlank.js";
 import { Node, start as startNode, end as endNode } from "../entities/Node.js";
 import { Screen } from "../entities/enums/Screen.js";
-import { Maze } from "../entities/Maze.js";
+import { Maze, start as startMaze} from "../entities/Maze.js";
+import { QuizType } from "../entities/enums/QuizType.js";
+import NextNodes from "../components/NextNodes.js";
+import { Quiz } from "../entities/Quiz.js";
+import MultipleChoice from "../components/MultipleChoice.js";
 
 export default function Quiz({
   context,
@@ -11,7 +20,7 @@ export default function Quiz({
   setScreen,
   setEndAt,
 }: {
-  context: BaseContext;
+  context: ContextAPIClients;
   maze: Maze;
   setScreen: Function;
   setEndAt: Function;
@@ -20,47 +29,40 @@ export default function Quiz({
   const [node, setNode] = useState(maze.nodes[0]);
 
 
-  startNode(node);
-
-  function onAnswer() {
-    endNode(node);
-
-    // current node is final
-    if (0 == node.nextNodes.length) {
-      setEndAt(Date.now());
-      setScreen(Screen.END);
-    } else {
-      setIsDone(true);
+    if (null == maze.startTime) {
+        startMaze(maze);
     }
-  }
 
-  let body;
-  if (isDone) {
-    const nextNodes = node.nextNodes().map((node : Node) => (
-      <button
-        onPress={() => {
-          setIsDone(false);
-          setNode(node);
-        }}
-      >
-        Node {node.url}
-      </button>
-    ));
-    body = (
-      <vstack gap="medium">
-        <text>Next Nodes</text>
-        {nextNodes}
-      </vstack>
-    );
-  } else {
+    startMaze(maze);
+
+    startNode(node);
+
+    function onAnswer() {
+        endNode(node);
+
+        // current node is final
+        if (0 == node.nextNodes.length) {
+            setEndAt(Date.now());
+            setScreen(Screen.END);
+        } else {
+            setIsDone(true);
+        }
+    }
+
+    let body;
+    if (isDone) {
+        body = (
+            <NextNodes
+                nodes={node.nextNodes}
+                setIsDone={setIsDone}
+                setNode={setNode}
+            />
+        );
+    } else {
     const quiz = node.quizs[0];
+
     body = (
-      <vstack gap="medium">
-        <text>Node: {node.url}</text>
-        <text>Question: {quiz.id}</text>
-        <text>Correct Answer: {quiz.correctAnswer}</text>
-        <button onPress={onAnswer}>Answer</button>
-      </vstack>
+      <Question context={context} node={node} quiz={quiz} onAnswer={onAnswer} />
     );
   }
 
@@ -69,4 +71,26 @@ export default function Quiz({
       {body}
     </vstack>
   );
+}
+
+function Question({
+  node,
+  quiz,
+  onAnswer,
+  context,
+}: {
+  context: ContextAPIClients;
+  node: Node;
+  quiz: Quiz;
+  onAnswer: Function;
+}) {
+  let body;
+  switch (quiz.type) {
+    case QuizType.FILL_BLANK:
+      body = <FillInTheBlank context={context} onAnswer={onAnswer} />;
+      break;
+    default:
+      body = <MultipleChoice context={context} onAnswer={onAnswer} />;
+  }
+  return body;
 }
