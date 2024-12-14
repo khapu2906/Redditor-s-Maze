@@ -147,6 +147,7 @@ export class Service {
 
 			console.log(`User ${this.context.userId} completed with rank: ${rank + 1}`);
 
+        return rank;
 		} catch (error) {
 			console.error(error);
 			throw new Error("Game error!!");
