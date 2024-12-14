@@ -66,34 +66,31 @@ export class Service {
 				pageSize: LevelMaxNode[level],
 			}).all();
 
-        console.debug("service.ts posts " + posts.length);
+			for (let i = 0; i < LevelMaxNode[level]; i++) {
+				if (!posts[i]) {
+					break;
+				}
+				const commentCount = 3;
+				const node = maze.createNode(posts[i].url)
+				const comments = await posts[i].comments.get(commentCount)
 
-			  for (let i = 0; i < LevelMaxNode[level]; i++) {
-				    if (!posts[i]) {
-					      break;
-				    }
-            const commentCount = 3;
-				    const node = maze.createNode(posts[i].url)
-				    const comments = await posts[i].comments.get(commentCount)
-
-            console.debug("service.ts comments " + comments.length);
-
-				    const quizSizeInNode = Math.floor(Math.random() * (commentCount - 1) + 1)
-				    let c = 0
-				    let extra = 0
-				    while (c < quizSizeInNode + extra && comments[c]) {
-					      const info: IExtendInfo = {
-						        content: comments[c].body,
-						        author: comments[c].authorName,
-						        url: comments[c].url,
-						        noiseAuthor: []
+				const quizSizeInNode = Math.floor(Math.random() * (commentCount - 1) + 1)
+				let c = 0
+				let extra = 0
+				while (c < quizSizeInNode + extra && comments[c]) {
+					const info: IExtendInfo = {
+						content: comments[c].body,
+						author: comments[c].authorName,
+						url: comments[c].url,
+						noiseAuthor: []
 					}
 
-					c++;
 					if (this._isGifUrl(comments[c].body)) {
+						c++;
 						extra++;
 						continue;
 					}
+					c++;
 
 					const typeQuizRandom = Math.floor(Math.random() * (2 - 1 + 1) + 1)
 
@@ -112,8 +109,8 @@ export class Service {
 				}
 			}
 
-			return bumpUp(maze)
-		} catch(error) {
+			return maze
+		} catch (error) {
 			console.error(error)
 		}
 	}

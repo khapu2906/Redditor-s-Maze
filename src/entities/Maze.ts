@@ -40,23 +40,19 @@ export function start(maze: Maze) {
 	maze.state = State.WORKING;
 }
 
-export function bumpUp(maze: Maze) {
-	maze.nodes.forEach((root, index) => {
-		if (index === maze.nodes.length - 1) {
-			root.isFinal = true
-		} else {
-			const others = maze.nodes.filter(item => item !== root);
-			const shuffled = others.sort(() => 0.5 - Math.random());
-
-			const randomCount = Math.max(2, Math.floor(Math.random() * others.length));
-			const next = shuffled.slice(0, randomCount);
-
-			root.clearNextNodes();
-			next.forEach(node => root.addNextNode(node));
-		}
-	});
-
-	return maze
+export async function bumpUp(currentNode: Node, maze: Maze) {
+	if (currentNode === maze.nodes[maze.nodes.length - 1]) {
+		currentNode.isFinal = true
+	
+		return []
+	} else {
+		const others = maze.nodes.filter((item) => currentNode !== item);
+		const shuffled = others.sort(() => 0.5 - Math.random());
+		const randomCount = Math.max(2, Math.floor(Math.random() * others.length));
+		const next = shuffled.slice(0, randomCount);
+		
+		return next
+	}
 }
 
 export function end(maze: Maze) {

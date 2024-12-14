@@ -13,7 +13,6 @@ export class Node {
 	public completedPoint: number = 0;
 
 	public rule: IRule;
-	public nextNodes: Array<Node> = []
 	public state: State = State.NOT_YET;
 	public startTime: Date | null = null;
 	public endTime: Date | null = null;
@@ -26,18 +25,6 @@ export class Node {
 		public url: string,
 	) {
 		this.rule = new RuleNode(this.level)
-	}
-
-	addNextNode(node: Node) {
-		this.nextNodes.push(node);
-	}
-
-	getNextNodes() {
-		return this.nextNodes
-	}
-
-	clearNextNodes(): void {
-		this.nextNodes = [];
 	}
 
 	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {

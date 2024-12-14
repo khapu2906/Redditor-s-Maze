@@ -20,8 +20,12 @@ export default function Transition({
     error,
   } = useAsync(async function () {
     const service = new Service(context);
-    return await service.loadMaze();
+    const maze = await service.loadMaze();
+    console.log(maze)
+    return maze
   });
+
+  console.log(maze, loading)
 
   function start() {
     setMaze(maze);
