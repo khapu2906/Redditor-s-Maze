@@ -137,7 +137,9 @@ export class Service {
 			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
 
-			await this.context.redis.zAdd(keyWordLeaderBoard, maze.completedPoint, this.context.userId);
+			await this.context.redis.zAdd(keyWordLeaderBoard, 
+				{ member: this.context.userId, score: maze.completedPoint },
+			);
 
 			await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
 
@@ -165,7 +167,7 @@ export class Service {
 			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
 			const numberOfFinishers = parseInt(await this.context.redis.get(keyWordLeaderBoardNumberOfFinisher), 10);
 
-			const userScore = await this.context.redis.zScore(keyWordLeaderBoard, this.context.userId);
+			const userScore = parseInt(await this.context.redis.zScore(keyWordLeaderBoard, this.context.userId));
 
 			console.log(`User rank: ${rank + 1}, Score: ${userScore}`);
 			return {
