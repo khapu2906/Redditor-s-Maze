@@ -18,7 +18,7 @@ export class Node {
 	public endTime: Date | null = null;
 
 	public isFinal: boolean = false
-	public quizs: Array<Quiz> = []
+	public quizs: any = {}
 
 	constructor(
 		public level: Level,
@@ -29,7 +29,9 @@ export class Node {
 
 	createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {
 		const quiz = new Quiz(this.level, info, type)
-		this.quizs.push(quiz)
+		// this.quizs.push(quiz)
+		const key = new Date()
+		this.quizs[key.getTime()] = quiz
 
 		return quiz;
 	}
