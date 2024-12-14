@@ -141,7 +141,7 @@ export class Service {
 
 			await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
 
-			const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId);
+			const rank = parseInt(await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId));
 
 			console.log(`User ${this.context.userId} completed with rank: ${rank + 1}`);
 
@@ -156,7 +156,7 @@ export class Service {
 		try {
 			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 
-			const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId);
+			const rank = parseInt(await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId));
 
 			if (rank === null) {
 				console.log("User not found in leaderboard.");
