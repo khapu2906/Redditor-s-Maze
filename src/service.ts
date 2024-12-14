@@ -4,6 +4,7 @@ import { Level, LevelMaxNode } from "./entities/enums/Level";
 import { QuizType } from "./entities/enums/QuizType";
 import { IExtendInfo } from "./entities/interfaces/IQuiz";
 import { User } from "./entities/User";
+import { State } from "./entities/enums/State";
 
 const redditUsernames: Array<string> = [
 	"FunnyToast42",
@@ -114,6 +115,70 @@ export class Service {
 			console.error(error)
 		}
 	}
+
+	public async saveUser(maze: Maze) {
+		try {
+			const keyWord = `postPlay:${this.context.postId}:${this.context.userId}`;
+
+			await this.context.redis.del(keyWord);
+
+			if (maze.state === State.NOT_YET || maze.state === State.WORKING) {
+				throw new Error("Game not done!!");
+			}
+
+			const user = {
+				...maze.user,
+				completedPoint: maze.completedPoint,
+			};
+
+			await this.context.redis.set(keyWord, JSON.stringify(user));
+
+			// Leaderboard Keys
+			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
+			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
+
+			await this.context.redis.zadd(keyWordLeaderBoard, maze.completedPoint, this.context.userId);
+
+			await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
+
+			const rank = await this.context.redis.zrevrank(keyWordLeaderBoard, this.context.userId);
+
+			console.log(`User ${this.context.userId} completed with rank: ${rank + 1}`);
+
+		} catch (error) {
+			console.error(error);
+			throw new Error("Game error!!");
+		}
+	}
+
+
+	public async getLeaderBoard() {
+		try {
+			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
+
+			const rank = await this.context.redis.zrevrank(keyWordLeaderBoard, this.context.userId);
+
+			if (rank === null) {
+				console.log("User not found in leaderboard.");
+				return { rank: null, numberOfFinishers: 0, userScore: 0 };
+			}
+			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
+			const numberOfFinishers = await this.context.redis.zcard(keyWordLeaderBoardNumberOfFinisher);
+
+			const userScore = await this.context.redis.zscore(keyWordLeaderBoard, this.context.userId);
+
+			console.log(`User rank: ${rank + 1}, Score: ${userScore}`);
+			return {
+				rank: rank + 1,
+				numberOfFinishers: numberOfFinishers,
+				userScore: userScore 
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error("Game error!!");
+		}
+	}
+
 
 	private __getRandomUsernames(usernames: Array<string>) {
 		const count = Math.floor(Math.random() * 3) + 1;
