@@ -10,8 +10,8 @@ export class Maze {
 	public rule: IRule;
 	public completedPoint: number = 0;
 	public state: State = State.NOT_YET;
-	public startTime: Date | null = null;
-	public endTime: Date | null = null;
+	public startTime: number = 0;
+	public endTime: number = 0;
 	public nodes: Array<Node> = []
 
 	constructor(
@@ -35,7 +35,7 @@ export class Maze {
 } 
 
 export function start(maze: Maze) {
-	maze.startTime = new Date()
+	maze.startTime = (new Date()).getTime()
 	maze.nodes[0] = startNode(maze.nodes[0])
 	maze.state = State.WORKING;
 }
@@ -63,8 +63,8 @@ export function end(maze: Maze) {
 		throw new Error("Maze end");
 	}
 	maze.state = State.DONE;
-	maze.endTime = new Date();
-	const completedTime = maze.endTime.getTime() - maze.startTime.getTime() / (60 * 1000);
+	maze.endTime = (new Date()).getTime();
+	const completedTime = maze.endTime - maze.startTime / (60 * 1000);
 	for (const node of maze.nodes) {
 		maze.completedPoint += node.completedPoint;
 	}

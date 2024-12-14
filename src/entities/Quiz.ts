@@ -12,8 +12,8 @@ export class Quiz {
 	public completedPoint: number = 0;
 	public state: StateQuiz = StateQuiz.NOT_YET;
 	public correctAnswer: string = "";
-	public startTime: Date | null = null;
-	public endTime: Date | null = null;
+	public startTime: number = 0;
+	public endTime: number = 0;
 	public isFinal: boolean = false
 	public questAgg: IQuestionAgg 
 
@@ -73,7 +73,7 @@ export class Quiz {
 }
 
 export function start(quiz: Quiz) {
-	quiz.startTime = new Date()
+	quiz.startTime = (new Date()).getTime()
 	quiz.state = StateQuiz.WORKING
 
 	return quiz
@@ -92,13 +92,13 @@ export function checkAnswer(quiz: Quiz, answer: string) {
 	if (answer.toLowerCase() === quiz.correctAnswer.toLowerCase()) {
 		result = true
 		quiz.state = StateQuiz.SUCCESS
-		quiz.endTime = new Date();
-		const completedTime = quiz.endTime.getTime() - quiz.startTime.getTime() / (60 * 1000);
+		quiz.endTime = (new Date()).getTime();
+		const completedTime = quiz.endTime - quiz.startTime / (60 * 1000);
 		calculatePointWithTime(quiz.rule, completedTime)
 		quiz.completedPoint = quiz.rule.maxCompletedPoint;
 	} else {
 		quiz.state = StateQuiz.FAIL
-		quiz.endTime = new Date();
+		quiz.endTime = (new Date()).getTime();
 		quiz.completedPoint = 0
 		result = false
 	}

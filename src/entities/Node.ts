@@ -14,8 +14,8 @@ export class Node {
 
 	public rule: IRule;
 	public state: State = State.NOT_YET;
-	public startTime: Date | null = null;
-	public endTime: Date | null = null;
+	public startTime: number = 0;
+	public endTime: number = 0;
 
 	public isFinal: boolean = false
 	public quizs: any = {}
@@ -38,7 +38,7 @@ export class Node {
 }
 
 export function start(node: Node) {
-	node.startTime = new Date()
+	node.startTime = (new Date()).getTime()
 	node.state = State.WORKING
 
 	return node
@@ -52,8 +52,8 @@ export function end(node: Node) {
 		throw new Error("Node end");
 	}
 	node.state = State.DONE
-	node.endTime = new Date();
-	const completedTime = node.endTime.getTime() - node.startTime.getTime() / (60 * 1000);
+	node.endTime = (new Date()).getTime();
+	const completedTime = node.endTime - node.startTime / (60 * 1000);
 	for (const quiz of node.quizs) {
 		node.completedPoint += quiz.completedPoint;
 	}
