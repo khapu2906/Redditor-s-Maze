@@ -137,11 +137,11 @@ export class Service {
 			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
 
-			await this.context.redis.zadd(keyWordLeaderBoard, maze.completedPoint, this.context.userId);
+			await this.context.redis.zAdd(keyWordLeaderBoard, maze.completedPoint, this.context.userId);
 
 			await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
 
-			const rank = await this.context.redis.zrevrank(keyWordLeaderBoard, this.context.userId);
+			const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId);
 
 			console.log(`User ${this.context.userId} completed with rank: ${rank + 1}`);
 
@@ -156,16 +156,16 @@ export class Service {
 		try {
 			const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 
-			const rank = await this.context.redis.zrevrank(keyWordLeaderBoard, this.context.userId);
+			const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId);
 
 			if (rank === null) {
 				console.log("User not found in leaderboard.");
 				return { rank: null, numberOfFinishers: 0, userScore: 0 };
 			}
 			const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
-			const numberOfFinishers = await this.context.redis.zcard(keyWordLeaderBoardNumberOfFinisher);
+			const numberOfFinishers = parseInt(await this.context.redis.get(keyWordLeaderBoardNumberOfFinisher), 10);
 
-			const userScore = await this.context.redis.zscore(keyWordLeaderBoard, this.context.userId);
+			const userScore = await this.context.redis.zScore(keyWordLeaderBoard, this.context.userId);
 
 			console.log(`User rank: ${rank + 1}, Score: ${userScore}`);
 			return {
