@@ -1,12 +1,9 @@
-import { Devvit, useAsync } from "@devvit/public-api";
-import Maze from "../entities/Maze.js";
-import { Level } from "../entities/enums/Level.js";
-import { Service } from "../service.js";
+import { Devvit } from "@devvit/public-api";
 import { Screen } from "../entities/enums/Screen.js";
 
 export default function Start({ context, setScreen, setMaze }) {
   return (
-    <vstack height="100%" gap="medium" alignment="middle center">
+    <vstack height="100%" width="100%" gap="medium" alignment="middle center">
       <button
         appearance="primary"
         minWidth="200px"

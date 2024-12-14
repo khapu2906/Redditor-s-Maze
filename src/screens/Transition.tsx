@@ -18,46 +18,41 @@ export default function Transition({
     error,
   } = useAsync(async function () {
     const service = new Service(context);
-    const maze = await service.loadMaze();
-    console.log(maze)
-    return maze
+    return await service.loadMaze();
   });
 
-  console.debug("Screens/Transition.tsx maze 24 ", maze);
+    function onStart() {
+        setMaze(maze);
+        setScreen(Screen.QUIZ);
+    }
 
-  let body = (
-    <vstack height="100%" gap="medium" alignment="center">
-      <text size="xxlarge">Ready?</text>
-      <button
-        appearance="primary"
-        onPress={async function () {
-          setMaze(maze);
-          setScreen(Screen.QUIZ);
-        }}
-      >
-        Start
-      </button>
-    </vstack>
-  );
-
-  if (loading) {
-    body = (
-      <vstack alignment="center" height="100%">
-        <text>Building Maze...</text>
-      </vstack>
+    let body = (
+        <vstack height="100%" gap="medium" alignment="center">
+            <text size="xxlarge">Ready?</text>
+            <button appearance="primary" onPress={onStart}>
+                Start
+            </button>
+        </vstack>
     );
-  }
 
-  if (error) {
-    body = (
-      <vstack gap="medium" alignment="center" height="100%">
-        <text>Error Getting Data!</text>
-        <button appearance="primary" onPress={() => setScreen(Screen.START)}>
-          Go Back
-        </button>
-      </vstack>
-    );
-  }
+    if (loading) {
+        body = (
+            <vstack alignment="center" height="100%">
+                <text>Building Maze...</text>
+            </vstack>
+        );
+    }
+
+    if (error) {
+        body = (
+            <vstack gap="medium" alignment="center" height="100%">
+                <text>Error Getting Data!</text>
+                <button appearance="primary" onPress={() => setScreen(Screen.START)}>
+                    Go Back
+                </button>
+            </vstack>
+        );
+    }
 
   return (
     <vstack alignment="center" height="100%" width="100%">

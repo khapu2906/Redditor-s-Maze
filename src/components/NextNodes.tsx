@@ -3,18 +3,18 @@ import { Node, start as startNode, end as endNode } from "../entities/Node.js";
 
 export default function NextNodes({
   nodes,
-  setIsDone,
   setNode,
+  setQuizIndex,
 }: {
   nodes: Node[];
-  setIsDone: Function;
   setNode: Function;
+  setQuizIndex: Function;
 }) {
   const nextNodes = nodes.map((node: Node) => (
     <button
       onPress={() => {
-        setIsDone(false);
         setNode(node);
+        setQuizIndex(0);
       }}
     >
       Node {node.url}

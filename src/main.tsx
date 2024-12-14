@@ -8,7 +8,7 @@ import { Screen } from "./entities/enums/Screen.js";
 import End from "./screens/End.js";
 import CreateMaze from "./screens/CreateMaze.js";
 import LeaderBoard from "./screens/LeaderBoard.js";
-import {bumpUp} from "./entities/Maze.js";
+import { bumpUp } from "./entities/Maze.js";
 
 Devvit.configure({
   redditAPI: true,
@@ -39,7 +39,7 @@ Devvit.addMenuItem({
 
 Devvit.addCustomPostType({
   name: "Experience Post",
-  height: "regular",
+  height: "tall",
   render: (context) => {
     const [screen, setScreen] = useState(Screen.START);
     const [maze, setMaze] = useState(null);
@@ -57,15 +57,15 @@ Devvit.addCustomPostType({
         break;
       case Screen.TRANSITION:
         currentScreen = (
-            <Transition
-                context={context}
-                setMaze={setMaze}
-                setScreen={setScreen}
-            />
+          <Transition
+            context={context}
+            setMaze={setMaze}
+            setScreen={setScreen}
+          />
         );
-            break;
-        case Screen.QUIZ:
-            console.debug("main.tsx 69 maze", maze)
+        break;
+      case Screen.QUIZ:
+        console.debug("main.tsx 69 maze", maze);
         currentScreen = (
           <Quiz
             context={context}
@@ -88,9 +88,9 @@ Devvit.addCustomPostType({
 
     return (
       <blocks height="tall">
-        <vstack height="100%" width="100%">
+        <zstack height="100%" width="100%">
           {currentScreen}
-        </vstack>
+        </zstack>
       </blocks>
     );
   },

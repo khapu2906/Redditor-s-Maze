@@ -40,7 +40,7 @@ export function start(maze: Maze) {
 	maze.state = State.WORKING;
 }
 
-export async function bumpUp(currentNode: Node, maze: Maze) {
+export function bumpUp(currentNode: Node, maze: Maze) : Node[] {
 	if (currentNode == maze.nodes[maze.nodes.length - 1]) {
 		currentNode.isFinal = true
 	
