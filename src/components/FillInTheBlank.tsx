@@ -13,7 +13,7 @@ context: ContextAPIClients,
         Answer
       </button>
     ) : (
-      <button appearance="primary" onPress={onAnswer}>
+      <button appearance="primary" onPress={() => onAnswer(answer)}>
         Answer
       </button>
     );

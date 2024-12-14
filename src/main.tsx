@@ -65,7 +65,6 @@ Devvit.addCustomPostType({
         );
         break;
       case Screen.QUIZ:
-        console.debug("main.tsx 69 maze", maze);
         currentScreen = (
           <Quiz
             context={context}

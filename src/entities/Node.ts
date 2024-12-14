@@ -54,7 +54,7 @@ export function end(node: Node) {
 	node.state = State.DONE
 	node.endTime = (new Date()).getTime();
 	const completedTime = node.endTime - node.startTime / (60 * 1000);
-	for (const quiz of node.quizs) {
+	  for (const quiz of Object.values(node.quizs)) {
 		node.completedPoint += quiz.completedPoint;
 	}
 	calculatePointWithTime(node.rule, completedTime);

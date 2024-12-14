@@ -41,7 +41,9 @@ export function start(maze: Maze) {
 }
 
 export function bumpUp(currentNode: Node, maze: Maze) : Node[] {
-	if (currentNode == maze.nodes[maze.nodes.length - 1]) {
+    console.debug("entities/Maze.ts currentNode ", currentNode)
+    console.debug("entities/Maze.ts maze ", maze)
+	if (currentNode.url == maze.nodes[maze.nodes.length - 1].url) {
 		currentNode.isFinal = true
 	
 		return []
