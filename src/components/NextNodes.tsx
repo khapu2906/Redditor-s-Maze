@@ -1,30 +1,34 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
 import { Screen } from "../entities/enums/Screen.js";
-import { Maze } from "../entities/Maze.js";
+import { Game } from "../main.js";
+import { Node, start as startNode } from "../entities/Node.js";
 
 export default function NextNodes({
-  maze,
+  game,
   nodeIndices,
-  setNodeIndex,
-  setQuizIndex,
-  setScreen,
+  setGame,
 }: {
-  maze: Maze;
+  game: Game;
   nodeIndices: number[];
-  setNodeIndex: Function;
-  setQuizIndex: Function;
-  setScreen: Dispatch<Screen>;
+  setGame: Dispatch<Game>;
 }) {
   const nextNodes = nodeIndices.map((index) => {
     return (
       <button
         onPress={() => {
-          const screen =
-            0 != maze.nodes[index].endTime ? Screen.SELECT_NODE : Screen.QUIZ;
+          const maze = game.maze;
+          let node = maze.nodes[index];
 
-          setScreen(screen);
-          setNodeIndex(index);
-          setQuizIndex(0);
+          if (0 == node.endTime) {
+            node = startNode(node);
+          }
+
+          const screen = 0 != node.endTime ? Screen.SELECT_NODE : Screen.QUIZ;
+
+          game.screen = screen;
+          game.nodeIndex = index;
+          game.quizIndex = 0;
+          setGame(game);
         }}
       >
         Node {index}

@@ -1,32 +1,19 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
-import { Node } from "../entities/Node.js";
-import { Maze, bumpUp, getNodeIndices } from "../entities/Maze.js";
+import { bumpUp, getNodeIndices } from "../entities/Maze.js";
 import NextNodes from "../components/NextNodes.js";
-import { Screen } from "../entities/enums/Screen.js";
+import { Game } from "../main.js";
 
 export default function SelectNode({
-  nodeIndex,
-  maze,
-  setScreen,
-  setNodeIndex,
-  setQuizIndex,
+  game,
+  setGame,
 }: {
-  nodeIndex: number;
-  maze: Maze;
-  setNodeIndex: Dispatch<number>;
-  setQuizIndex: Dispatch<number>;
-  setScreen: Dispatch<Screen>;
+  game: Game;
+  setGame: Dispatch<Game>;
 }) {
-    const node = maze.nodes.at(nodeIndex)
-  const nextIndices = getNodeIndices({maze, nodes: bumpUp(node, maze)})
+  const maze = game.maze;
+  const nodeIndex = game.nodeIndex;
+  const node = maze.nodes.at(nodeIndex);
+  const nextIndices = getNodeIndices({ maze, nodes: bumpUp(node, maze) });
 
-  return (
-    <NextNodes
-        maze={maze}
-      nodeIndices={nextIndices}
-      setQuizIndex={setQuizIndex}
-      setNodeIndex={setNodeIndex}
-      setScreen={setScreen}
-    />
-  );
+  return <NextNodes game={game} nodeIndices={nextIndices} setGame={setGame} />;
 }

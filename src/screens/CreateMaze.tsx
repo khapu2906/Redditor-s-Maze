@@ -1,8 +1,15 @@
-import { Devvit, useForm, useState } from "@devvit/public-api";
+import {
+  ContextAPIClients,
+  Devvit,
+  Dispatch,
+  useForm,
+  useState,
+} from "@devvit/public-api";
 import { Level } from "../entities/enums/Level.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
 import { Service } from "../service.js";
+import { Game } from "../main.js";
 
 const difficulties = [
   { string: "Easy", value: Level.EASY },
@@ -17,7 +24,15 @@ const keywords = [
   { string: "gaming", value: "gaming" },
 ];
 
-export default function CreateMaze({ context, setScreen }) {
+export default function CreateMaze({
+  context,
+  game,
+  setGame,
+}: {
+  context: ContextAPIClients;
+  game: Game;
+  setGame: Dispatch<Game>;
+}) {
   const [subreddit, setSubreddit] = useState("");
   const [difficulty, setDifficulty] = useState(Level.EASY);
 
@@ -62,11 +77,11 @@ export default function CreateMaze({ context, setScreen }) {
   }
 
   async function onCreate() {
-      context.ui.showToast({text: "Creating Maze...", appearance: "neutral"});
-      console.debug("screens/Start.tsx keyword: " + subreddit);
-      const service = new Service(context);
-      await service.configMaze(subreddit, difficulty);
-      context.ui.showToast({text: "Maze Created!", appearance: "success"});
+    context.ui.showToast({ text: "Creating Maze...", appearance: "neutral" });
+    console.debug("screens/Start.tsx keyword: " + subreddit);
+    const service = new Service(context);
+    await service.configMaze(subreddit, difficulty);
+    context.ui.showToast({ text: "Maze Created!", appearance: "success" });
   }
 
   const text =
@@ -79,7 +94,9 @@ export default function CreateMaze({ context, setScreen }) {
   const button =
     subreddit == "" ? (
       // disable button if no keywore entered
-        <button icon="upload-fill" appearance="secondary">Create</button>
+      <button icon="upload-fill" appearance="secondary">
+        Create
+      </button>
     ) : (
       <button icon="upload-fill" appearance="primary" onPress={onCreate}>
         Create
@@ -92,7 +109,7 @@ export default function CreateMaze({ context, setScreen }) {
 
   return (
     <vstack height="100%" width="100%" alignment="center" gap="medium">
-      <BackScreen screen={Screen.START} setScreen={setScreen} />
+      <BackScreen screen={Screen.START} game={game} setGame={setGame} />
 
       <vstack gap="medium" alignment="center">
         <hstack alignment="middle" minWidth="200px">

@@ -3,7 +3,7 @@ import IRule from "./interfaces/IRule";
 
 import { State } from "./enums/State";
 
-import { Node, start as startNode } from "./Node";
+import { Node, start as startNode } from "./Node.js";
 import { RuleMaze, calculatePointWithTime } from "./Rules";
 import { User } from "./User";
 export class Maze {
@@ -36,7 +36,7 @@ export class Maze {
 
 export function start(maze: Maze) {
   maze.startTime = new Date().getTime();
-  // maze.nodes[0] = startNode(maze.nodes[0]);
+  maze.nodes[0] = startNode(maze.nodes[0]);
   maze.state = State.WORKING;
 
   return maze;
@@ -86,6 +86,9 @@ export function getNodeIndices({
   nodes: Node[];
 }): number[] {
   const urls = maze.nodes.map((node) => node.url);
-    console.debug(urls)
   return nodes.map((node) => urls.findIndex((url) => url == node.url));
+}
+
+export function isLastNode({maze, node} : {maze: Maze; node : Node}) { 
+    return node.url == maze.nodes.at(-1).url
 }

@@ -4,7 +4,7 @@ import BackScreen from "../components/BackScreen.js";
 import ScoreBoard from "../components/ScoreBoard.js";
 import { Service } from "../service.js";
 
-export default function LeaderBoard({ setScreen, context }) {
+export default function LeaderBoard({ game, setGame, context }) {
   const { data, loading, error } = useAsync(async () => {
     const service = new Service(context);
     return await service.getLeaderBoard();
@@ -28,7 +28,7 @@ export default function LeaderBoard({ setScreen, context }) {
 
   return (
     <vstack height="100%" width="100%" alignment="center">
-      <BackScreen screen={Screen.START} setScreen={setScreen} />
+      <BackScreen screen={Screen.START} setGame={setGame} game={game} />
 
       <vstack height="100%" width="100%" gap="medium" alignment="center">
         <ScoreBoard usernames={["user"]} scores={[100]} />

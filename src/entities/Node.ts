@@ -7,7 +7,7 @@ import { RuleNode, calculatePointWithTime } from "./Rules";
 
 import { State } from "./enums/State";
 
-import { Quiz, start as startQuiz } from "./Quiz";
+import { Quiz, start as _startQuiz } from "./Quiz.js";
 import { checkAnswer } from "./Quiz.js";
 
 export class Node {
@@ -19,7 +19,7 @@ export class Node {
   public endTime: number = 0;
 
   public isFinal: boolean = false;
-  public quizs: any = {};
+  public quizs: Quiz[] = [];
 
   constructor(
     public level: Level,
@@ -30,9 +30,9 @@ export class Node {
 
   createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {
     const quiz = new Quiz(this.level, info, type);
-    // this.quizs.push(quiz)
+    this.quizs.push(quiz);
     const key = new Date();
-    this.quizs[key.getTime()] = quiz;
+    // this.quizs[key.getTime()] = quiz;
 
     return quiz;
   }
@@ -40,6 +40,8 @@ export class Node {
 
 export function start(node: Node) {
   node.startTime = new Date().getTime();
+  const firstQuiz = getQuiz({ node, quizIndex: 0 });
+  node.quizs[0] = _startQuiz(firstQuiz);
   node.state = State.WORKING;
 
   return node;
@@ -57,7 +59,7 @@ export function end(node: Node) {
   node.state = State.DONE;
   node.endTime = new Date().getTime();
   const completedTime = node.endTime - node.startTime / (60 * 1000);
-  for (const quiz of Object.values(node.quizs)) {
+  for (const quiz of node.quizs) {
     node.completedPoint += quiz.completedPoint;
   }
   calculatePointWithTime(node.rule, completedTime);
@@ -69,18 +71,54 @@ export function end(node: Node) {
 export function checkQuiz({
   node,
   quizIndex,
-  answer
+  answer,
 }: {
   node: Node;
   quizIndex: number;
-    answer: string
+  answer: string;
 }) {
-    // get quiz value
-    const quiz: Quiz = Object.values(node.quizs).at(quizIndex);
-    // update quiz value
-    const {quiz: newQuiz} = checkAnswer(quiz, answer)
+  // get quiz value
+  const quiz = getQuiz({ node, quizIndex });
+  // update quiz value
+  const { quiz: newQuiz } = checkAnswer(quiz, answer);
 
-    node.quizs[quizIndex] = newQuiz
+  node.quizs[quizIndex] = newQuiz;
 
-    return node
+  return node;
+}
+
+export function getQuiz({
+  node,
+  quizIndex,
+}: {
+  node: Node;
+  quizIndex: number;
+}) {
+  return node.quizs.at(quizIndex);
+}
+
+export function isLastQuiz({
+  node,
+  quizIndex,
+}: {
+  node: Node;
+  quizIndex: number;
+}) {
+  console.log(node.quizs);
+  return node.quizs.length - 1 == quizIndex;
+}
+
+export function startQuiz({
+  node,
+  quizIndex,
+}: {
+  node: Node;
+  quizIndex: number;
+}) {
+  let quiz = getQuiz({ node, quizIndex });
+  if (quiz == undefined) throw Error("quizIndex out of range ");
+  quiz = _startQuiz(quiz);
+  node.quizs[0] = quiz;
+
+  return node;
 }

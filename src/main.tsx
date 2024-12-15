@@ -1,15 +1,13 @@
 // Learn more at developers.reddit.com/docs
-import { Devvit, useAsync, useState } from "@devvit/public-api";
+import { Devvit, useState } from "@devvit/public-api";
 import Start from "./screens/Start.js";
 import Transition from "./screens/Transition.js";
-import { start as startMaze } from "./entities/Maze.js";
+import { Maze } from "./entities/Maze.js";
 import Quiz from "./screens/Quiz.js";
 import { Screen } from "./entities/enums/Screen.js";
 import End from "./screens/End.js";
 import CreateMaze from "./screens/CreateMaze.js";
 import LeaderBoard from "./screens/LeaderBoard.js";
-import { bumpUp } from "./entities/Maze.js";
-import Answer from "./components/CheckAnswer.js";
 import CheckAnswer from "./screens/CheckAnswer.js";
 import SelectNode from "./screens/SelectNode.js";
 
@@ -40,79 +38,57 @@ Devvit.addMenuItem({
   },
 });
 
+export interface Game {
+  maze: Maze;
+  quizIndex: number;
+  nodeIndex: number;
+  screen: Screen;
+}
+
 Devvit.addCustomPostType({
   name: "Experience Post",
   height: "tall",
   render: (context) => {
-    const [screen, setScreen] = useState(Screen.START);
-    const [maze, setMaze] = useState(null);
-    const [quizIndex, setQuizIndex] = useState(0);
-    const [nodeIndex, setNodeIndex] = useState(0);
-
+    const [game, setGame] = useState<Game>({
+      screen: Screen.START,
+      quizIndex: 0,
+      maze: {},
+      nodeIndex: 0,
+    });
+      
+      console.debug("main.tsx maze", game.maze)
+      console.debug("main.tsx game", game)
     let currentScreen;
-
-    switch (screen) {
+    switch (game.screen) {
       case Screen.SELECT_NODE:
-        currentScreen = (
-          <SelectNode
-            nodeIndex={nodeIndex}
-            maze={maze}
-            setNodeIndex={setNodeIndex}
-            setQuizIndex={setQuizIndex}
-            setScreen={setScreen}
-          />
-        );
+        currentScreen = <SelectNode game={game} setGame={setGame} />;
         break;
       case Screen.CHECK_ANSWER:
-        currentScreen = (
-          <CheckAnswer
-            quizIndex={quizIndex}
-            setQuizIndex={setQuizIndex}
-            setScreen={setScreen}
-            maze={maze}
-            setMaze={setMaze}
-            nodeIndex={nodeIndex}
-            setNodeIndex={setNodeIndex}
-          />
-        );
+        currentScreen = <CheckAnswer game={game} setGame={setGame} />;
         break;
       case Screen.CREATE_MAZE:
-        currentScreen = <CreateMaze context={context} setScreen={setScreen} />;
+        currentScreen = (
+          <CreateMaze context={context} game={game} setGame={setGame} />
+        );
         break;
       case Screen.LEADER_BOARD:
-        currentScreen = <LeaderBoard context={context} setScreen={setScreen} />;
+        currentScreen = <LeaderBoard context={context} setGame={setGame} />;
         break;
       case Screen.TRANSITION:
         currentScreen = (
-          <Transition
-            context={context}
-            setMaze={setMaze}
-            setScreen={setScreen}
-          />
+          <Transition context={context} game={game} setGame={setGame} />
         );
         break;
       case Screen.QUIZ:
         currentScreen = (
-          <Quiz
-            context={context}
-            nodeIndex={nodeIndex}
-            quizIndex={quizIndex}
-           setScreen={setScreen}
-            maze={maze}
-            setMaze={setMaze}
-            setNodeIndex={setNodeIndex}
-          />
+          <Quiz context={context} game={game} setGame={setGame} />
         );
         break;
       case Screen.END:
-        currentScreen = (
-          <End  setScreen={setScreen} maze={ maze } context={context} />
-        );
+        currentScreen = <text>Nice job, no more state hell</text>;
         break;
       default:
-        currentScreen = (
-          <Start setScreen={setScreen} context={context} setMaze={setMaze} />
-        );
+        currentScreen = <Start game={game} setGame={setGame} />;
     }
 
     return (

@@ -1,71 +1,69 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
-import { Node, end as endNode } from "../entities/Node.js";
+import { Node, getQuiz, start as startNode, startQuiz } from "../entities/Node.js";
 import Answer from "../components/Answer.js";
-import { Maze, bumpUp, getNodeIndices, end as endMaze } from "../entities/Maze.js";
+import {
+  bumpUp,
+  getNodeIndices,
+  end as endMaze,
+  isLastNode,
+} from "../entities/Maze.js";
 import { Screen } from "../entities/enums/Screen.js";
 import NextNodes from "../components/NextNodes.js";
-import { Quiz } from "../entities/Quiz.js";
 import { StateQuiz } from "../entities/enums/State.js";
+import { Game } from "../main.js";
 
 export default function CheckAnswer({
-  quizIndex,
-  setQuizIndex,
-  setNodeIndex,
-  nodeIndex,
-  maze,
-  setScreen,
-  setMaze,
+  game,
+  setGame,
 }: {
-  quizIndex: number;
-  setQuizIndex: Dispatch<number>;
-  setNodeIndex: Dispatch<number>;
-  nodeIndex: number;
-  maze: Maze;
-  setScreen: Dispatch<Screen>;
-  setMaze: Dispatch<Maze>;
+  game: Game;
+  setGame: Dispatch<Game>;
 }) {
+  const nodeIndex = game.nodeIndex;
+  const maze = game.maze;
+  const quizIndex = game.quizIndex;
   const node: Node = maze.nodes.at(nodeIndex);
-  let action;
+  const quiz = getQuiz({ node, quizIndex });
+    let action = (
+        <button
+            appearance="primary"
+            onPress={() => {
+                // update next quiz
+                const newQuizIndex = quizIndex + 1;
+                maze.nodes[nodeIndex] = startQuiz({node, quizIndex: newQuizIndex});
+                game.quizIndex = newQuizIndex;
+                game.screen = Screen.QUIZ
+                setGame(game);
+            }}
+        >
+            Next Quiz
+    </button>
+  );
 
-  console.debug("screens/CheckAnswer maze 30", maze);
-  if (
-    Object.values(node.quizs).length == 1 ||
-    Object.values(node.quizs).length - 1 == quizIndex
-  ) {
-    if (0 == node.endTime) {
-      maze.nodes[nodeIndex] = endNode(node);
-      setMaze(maze);
-    }
+  // node is done
+  if (0 != node.endTime) {
     const nextIndices = getNodeIndices({ maze, nodes: bumpUp(node, maze) });
 
-    action =
-      node.url == maze.nodes.at(-1).url ? (
-        // last node of maze
-        <button appearance="primary" onPress={async () => {
-            setMaze(endMaze(maze))
-            setScreen(Screen.END)}}>
-          Finish!
-        </button>
-      ) : (
-        (action = (
-          <NextNodes
-              maze={maze}
-            nodeIndices={nextIndices}
-            setQuizIndex={setQuizIndex}
-            setNodeIndex={setNodeIndex}
-            setScreen={setScreen}
-          />
-        ))
-      );
-  } else {
     action = (
-      <button appearance="primary" onPress={() => setQuizIndex(quizIndex + 1)}>
-        Next Quiz
-      </button>
+      <NextNodes game={game} nodeIndices={nextIndices} setGame={setGame} />
     );
   }
 
-  const quiz: Quiz = Object.values(node.quizs).at(quizIndex);
+  // reach the final node of the maze
+  if (isLastNode({ maze, node })) {
+    action = (
+      <button
+        appearance="primary"
+        onPress={async () => {
+          game.maze = endMaze(maze);
+          game.screen = Screen.END;
+          setGame(game);
+        }}
+      >
+        Finish!
+      </button>
+    );
+  }
 
   return (
     <vstack

@@ -1,48 +1,47 @@
 import { Devvit, ContextAPIClients, Dispatch } from "@devvit/public-api";
 import FillInTheBlank from "../components/FillInTheBlank.js";
-import { Node, checkQuiz, start as startNode } from "../entities/Node.js";
+import {
+  Node,
+  checkQuiz,
+  start as startNode,
+  end as endNode,
+  getQuiz,
+  isLastQuiz,
+} from "../entities/Node.js";
 import { Screen } from "../entities/enums/Screen.js";
-import { Maze } from "../entities/Maze.js";
 import { QuizType } from "../entities/enums/QuizType.js";
 import { Quiz as QuizModel, start as startQuiz } from "../entities/Quiz.js";
 import MultipleChoice from "../components/MultipleChoice.js";
+import { Game } from "../main.js";
+import { isLastNode } from "../entities/Maze.js";
 
 export default function Quiz({
   context,
-  nodeIndex,
-  quizIndex,
-  setScreen,
-  setMaze,
-  maze,
+  game,
+  setGame,
 }: {
   context: ContextAPIClients;
-  nodeIndex: number;
-  quizIndex: number;
-  setScreen: Function;
-  setMaze: Dispatch<Maze>;
-  setNodeIndex: Dispatch<number>;
-  maze: Maze;
+  game: Game;
+  setGame: Dispatch<Game>;
 }) {
-  const node: Node = maze.nodes.at(nodeIndex);
-  const quiz: QuizModel = Object.values(node.quizs).at(quizIndex);
-  if (0 == quiz.startTime) {
-    // assign new value to quiz
-    node.quizs[quizIndex] = startQuiz(quiz);
-    // update maze to node
-    maze.nodes[nodeIndex] = node;
-    setMaze(maze);
-  }
+  const nodeIndex = game.nodeIndex;
+  const quizIndex = game.quizIndex;
+  const maze = game.maze;
 
-  if (0 == node.startTime) {
-    // find node and assign new value
-    maze.nodes[nodeIndex] = startNode(node);
-    setMaze(maze);
-  }
+  const node: Node = game.maze.nodes.at(nodeIndex);
+  const quiz = getQuiz({ node, quizIndex });
 
-  async function onAnswer(answer: string) {
-    maze.nodes[nodeIndex] = checkQuiz({ node, quizIndex, answer });
-      setMaze(maze);
-      setScreen(Screen.CHECK_ANSWER);
+  function onAnswer(answer: string) {
+    let newNode = checkQuiz({ node, quizIndex, answer });
+
+    if (isLastQuiz({ node: newNode, quizIndex })) {
+      newNode = endNode(newNode);
+    }
+
+    maze.nodes[nodeIndex] = newNode;
+    game.maze = maze;
+    game.screen = Screen.CHECK_ANSWER;
+    setGame(game);
   }
 
   return (
