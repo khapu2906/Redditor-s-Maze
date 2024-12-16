@@ -17,13 +17,6 @@ const difficulties = [
   { string: "Hard", value: Level.HARD },
 ];
 
-const keywords = [
-  { string: "Home", value: "Home" },
-  { string: "memes", value: "memes" },
-  { string: "NoStupidQuestions", value: "NoStupidQuestions" },
-  { string: "gaming", value: "gaming" },
-];
-
 export default function CreateMaze({
   context,
   game,
@@ -35,6 +28,7 @@ export default function CreateMaze({
 }) {
   const [subreddit, setSubreddit] = useState("");
   const [difficulty, setDifficulty] = useState(Level.EASY);
+  const service = new Service(context);
 
   const difficultyForm = useForm(
     {
@@ -56,16 +50,27 @@ export default function CreateMaze({
     {
       fields: [
         {
-          type: "select",
-          name: "keyword",
-          label: "Keyword",
-          options: keywords.map((obj) => {
-            return { label: obj.string, value: obj.value };
-          }),
+          type: "string",
+          name: "subreddit",
+          label: "Subreddit",
         },
       ],
     },
-    (values) => setSubreddit(values.keyword[0]),
+    async function (values) {
+      const name = values.subreddit?.replaceAll(" ", "") ?? "";
+
+      if (undefined == name) {
+        context.ui.showToast("Error getting name!");
+      }
+      if ("" == name) {
+        context.ui.showToast("Subreddit not exist!");
+      }
+      if (await service.isSubredditExist(name)) {
+        setSubreddit(name);
+      } else {
+        context.ui.showToast("Subreddit not exist!");
+      }
+    },
   );
 
   function showKeywordsForm() {
@@ -78,18 +83,17 @@ export default function CreateMaze({
 
   async function onCreate() {
     context.ui.showToast({ text: "Creating Maze...", appearance: "neutral" });
-    console.debug("screens/Start.tsx keyword: " + subreddit);
-    const service = new Service(context);
-    await service.configMaze(subreddit, difficulty);
-    context.ui.showToast({ text: "Maze Created!", appearance: "success" });
+    try {
+      context.ui.navigateTo(
+        await service.createMaze({ subreddit, level: difficulty }),
+      );
+    } catch (error) {
+      context.ui.showToast({
+        text: "Error Creating Maze! Try Later",
+        appearance: "neutral",
+      });
+    }
   }
-
-  const text =
-    subreddit == "" ? (
-      <text color="neutral-content-weak">Subreddit</text>
-    ) : (
-      <text>{subreddit}</text>
-    );
 
   const button =
     subreddit == "" ? (
@@ -108,12 +112,12 @@ export default function CreateMaze({
   ).string;
 
   return (
-    <vstack height="100%" width="100%" alignment="center" gap="medium">
+    <vstack height="100%" width="100%" alignment="center">
       <BackScreen screen={Screen.START} game={game} setGame={setGame} />
 
-      <vstack gap="medium" alignment="center">
+      <vstack height="70%" gap="large" alignment="middle center">
         <hstack alignment="middle" minWidth="200px">
-          {text}
+          <text>Subreddit: {subreddit}</text>
           <spacer size="medium" grow />
           <button icon="topic-programming" onPress={showKeywordsForm}></button>
         </hstack>
@@ -122,9 +126,9 @@ export default function CreateMaze({
           <spacer size="medium" grow />
           <button icon="caret-down" onPress={showDifficultyForm}></button>
         </hstack>
-      </vstack>
 
-      {button}
+        {button}
+      </vstack>
     </vstack>
   );
 }

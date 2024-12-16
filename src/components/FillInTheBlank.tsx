@@ -1,9 +1,18 @@
-import { useState, Devvit, useForm, ContextAPIClients } from "@devvit/public-api";
+import {
+  useState,
+  Devvit,
+  useForm,
+  ContextAPIClients,
+} from "@devvit/public-api";
 
-export default function FillInTheBlank({ context, question, onAnswer }: {
-context: ContextAPIClients,
-    question: string,
-    onAnswer: Function
+export default function FillInTheBlank({
+  context,
+  question,
+  onAnswer,
+}: {
+  context: ContextAPIClients;
+  question: string;
+  onAnswer: Function;
 }) {
   const [answer, setAnswer] = useState("");
 
@@ -32,15 +41,16 @@ context: ContextAPIClients,
   );
 
   return (
-    <vstack alignment="middle center" gap="medium" width="100%">
+    <vstack alignment="middle center" gap="medium" width="100%" grow>
       <text>Fill In The Blank</text>
-      <text width="70%" wrap={true}>
-        Question: {question}
-      </text>
+
+      <text width="70%" wrap={true}>{question}</text>
 
       <hstack minWidth="200px" alignment="middle">
         <text>Keyword: {answer}</text>
+
         <spacer grow />
+
         <button
           icon="topic-programming-outline"
           onPress={() => context.ui.showForm(form)}

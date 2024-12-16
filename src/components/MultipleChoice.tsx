@@ -25,10 +25,16 @@ context: ContextAPIClients,
     );
 
   return (
-    <vstack alignment="middle center" gap="medium" width="100%">
+    <vstack alignment="middle center" gap="medium" width="100%" grow>
       <text>Multiple choice</text>
-      <text width="70%" wrap={true}>Question: {question}</text>
-      <Options options={options} answer={answer} setAnswer={setAnswer} />
+
+      <text width="70%" wrap={true}>{question}</text>
+
+      <spacer grow />
+
+      <hstack width="100%" alignment="center">
+          <Options options={options} answer={answer} setAnswer={setAnswer} />
+      </hstack>
 
       {button}
     </vstack>
@@ -36,34 +42,34 @@ context: ContextAPIClients,
 }
 
 function Options({
-  options,
-  setAnswer,
-  answer,
+    options,
+    setAnswer,
+    answer,
 }: {
-  options: string[];
-  setAnswer: Function;
-  answer: string;
+    options: string[];
+    setAnswer: Function;
+    answer: string;
 }) {
-  const buttons = options.map(function (string) {
-    let icon: IconName = "radio-button-outline";
-    let appearance: Devvit.Blocks.ButtonAppearance = "plain";
+    const buttons = options.map(function (string) {
+        let icon: IconName = "radio-button-outline";
+        let appearance: Devvit.Blocks.ButtonAppearance = "plain";
 
-    if (answer == string) {
-      icon = "radio-button-fill";
-      appearance = "secondary";
-    }
-    return (
-      <button
-        icon={icon}
-        appearance={appearance}
-        onPress={() => setAnswer(string)}
-      >
-        {string}
-      </button>
+        if (answer == string) {
+            icon = "radio-button-fill";
+            appearance = "plain";
+        }
+        return (
+            <button minWidth="50px" 
+                icon={icon}
+                appearance={appearance}
+                onPress={() => setAnswer(string)}
+            >
+                {string}
+            </button>
     );
   });
   return (
-    <vstack minWidth="300px" gap="medium">
+    <vstack minWidth="50px" gap="medium" alignment="start">
       {buttons}
     </vstack>
   );

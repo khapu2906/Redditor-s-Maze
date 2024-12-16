@@ -2,12 +2,13 @@ import {
   Devvit,
   useAsync,
   ContextAPIClients,
-  Dispatch,
+    Dispatch,
+    BaseContext,
 } from "@devvit/public-api";
 import { Service } from "../service.js";
 import { Screen } from "../entities/enums/Screen.js";
 import BackScreen from "../components/BackScreen.js";
-import { Maze, start as startMaze } from "../entities/Maze.js";
+import { start as startMaze } from "../entities/Maze.js";
 import { Game } from "../main.js";
 
 export default function Transition({
@@ -15,7 +16,7 @@ export default function Transition({
   game,
   setGame,
 }: {
-  context: ContextAPIClients;
+  context: ContextAPIClients & BaseContext;
   game: Game;
   setGame: Dispatch<Game>;
 }) {
@@ -35,7 +36,7 @@ export default function Transition({
   }
 
   let body = (
-    <vstack height="100%" gap="medium" alignment="center">
+    <vstack height="100%" gap="large" alignment="middle center" width="100%">
       <text size="xxlarge">Ready?</text>
       <button appearance="primary" onPress={onStart}>
         Start
@@ -45,7 +46,7 @@ export default function Transition({
 
   if (loading) {
     body = (
-      <vstack alignment="center" height="100%">
+      <vstack alignment="middle center" height="90%" width="100%">
         <text>Building Maze...</text>
       </vstack>
     );
@@ -53,13 +54,13 @@ export default function Transition({
 
   if (error) {
     body = (
-      <vstack gap="medium" alignment="center" height="100%">
+      <vstack gap="medium" alignment="middle center" height="100%" width="100%">
         <text>Error Getting Data!</text>
         <button
           appearance="primary"
           onPress={() => {
-              game.screen = Screen.START;
-              setGame(game);
+            game.screen = Screen.START;
+            setGame(game);
           }}
         >
           Go Back
@@ -69,8 +70,8 @@ export default function Transition({
   }
 
   return (
-    <vstack alignment="center" height="100%" width="100%">
-      <BackScreen screen={Screen.START} game={ game } setGame={setGame} />
+    <vstack alignment="center" height="70%" width="100%">
+      <BackScreen screen={Screen.START} game={game} setGame={setGame} />
 
       {body}
     </vstack>

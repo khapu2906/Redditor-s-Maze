@@ -1,5 +1,5 @@
 // Learn more at developers.reddit.com/docs
-import { Devvit, useState } from "@devvit/public-api";
+import { Devvit, Dispatch, useState } from "@devvit/public-api";
 import Start from "./screens/Start.js";
 import Transition from "./screens/Transition.js";
 import { Maze } from "./entities/Maze.js";
@@ -39,7 +39,7 @@ Devvit.addMenuItem({
 });
 
 export interface Game {
-  maze: Maze;
+  maze: Maze | null;
   quizIndex: number;
   nodeIndex: number;
   screen: Screen;
@@ -49,15 +49,14 @@ Devvit.addCustomPostType({
   name: "Experience Post",
   height: "tall",
   render: (context) => {
-    const [game, setGame] = useState<Game>({
+    const [game, setGame]: [game: Game, setGame: Dispatch<Game>] = useState({
       screen: Screen.START,
       quizIndex: 0,
-      maze: {},
+      maze: null,
       nodeIndex: 0,
     });
-      
-      console.debug("main.tsx maze", game.maze)
-      console.debug("main.tsx game", game)
+
+    console.debug("main.tsx maze", game.maze);
     let currentScreen;
     switch (game.screen) {
       case Screen.SELECT_NODE:
@@ -72,7 +71,7 @@ Devvit.addCustomPostType({
         );
         break;
       case Screen.LEADER_BOARD:
-        currentScreen = <LeaderBoard context={context} setGame={setGame} />;
+        currentScreen = <LeaderBoard context={context} game={ game } setGame={setGame} />;
         break;
       case Screen.TRANSITION:
         currentScreen = (
@@ -85,7 +84,7 @@ Devvit.addCustomPostType({
         );
         break;
       case Screen.END:
-        currentScreen = <text>Nice job, no more state hell</text>;
+        currentScreen = <End context={context} game={game} setGame={setGame} />;
         break;
       default:
         currentScreen = <Start game={game} setGame={setGame} />;

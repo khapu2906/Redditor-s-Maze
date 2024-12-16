@@ -1,5 +1,5 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
-import { Node, getQuiz, start as startNode, startQuiz } from "../entities/Node.js";
+import { getQuiz, startQuiz } from "../entities/Node.js";
 import Answer from "../components/Answer.js";
 import {
   bumpUp,
@@ -22,21 +22,30 @@ export default function CheckAnswer({
   const nodeIndex = game.nodeIndex;
   const maze = game.maze;
   const quizIndex = game.quizIndex;
-  const node: Node = maze.nodes.at(nodeIndex);
+  const node = maze.nodes.at(nodeIndex);
+
+  if (node == undefined) {
+    throw Error("nodeIndex out of range");
+  }
+
   const quiz = getQuiz({ node, quizIndex });
-    let action = (
-        <button
-            appearance="primary"
-            onPress={() => {
-                // update next quiz
-                const newQuizIndex = quizIndex + 1;
-                maze.nodes[nodeIndex] = startQuiz({node, quizIndex: newQuizIndex});
-                game.quizIndex = newQuizIndex;
-                game.screen = Screen.QUIZ
-                setGame(game);
-            }}
-        >
-            Next Quiz
+  if (quiz == undefined) {
+    throw Error("quizIndex out of range");
+  }
+
+  let action = (
+    <button
+      appearance="primary"
+      onPress={() => {
+        // update next quiz
+        const newQuizIndex = quizIndex + 1;
+        maze.nodes[nodeIndex] = startQuiz({ node, quizIndex: newQuizIndex });
+        game.quizIndex = newQuizIndex;
+        game.screen = Screen.QUIZ;
+        setGame(game);
+      }}
+    >
+      Next Quiz
     </button>
   );
 
@@ -69,16 +78,14 @@ export default function CheckAnswer({
     <vstack
       padding="medium"
       gap="medium"
-      alignment="center"
+      alignment="middle center"
       width="100%"
       height="100%"
     >
-      <vstack height="50%" alignment="middle center" gap="medium">
-        <Answer
-          isCorrect={quiz.state == StateQuiz.SUCCESS}
-          point={quiz.completedPoint}
-        />
-      </vstack>
+      <Answer
+        isCorrect={quiz.state == StateQuiz.SUCCESS}
+        point={quiz.completedPoint}
+      />
       {action}
     </vstack>
   );

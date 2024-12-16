@@ -17,8 +17,6 @@ export class Node {
   public state: State = State.NOT_YET;
   public startTime: number = 0;
   public endTime: number = 0;
-
-  public isFinal: boolean = false;
   public quizs: Quiz[] = [];
 
   constructor(
@@ -31,9 +29,6 @@ export class Node {
   createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {
     const quiz = new Quiz(this.level, info, type);
     this.quizs.push(quiz);
-    const key = new Date();
-    // this.quizs[key.getTime()] = quiz;
-
     return quiz;
   }
 }
@@ -41,9 +36,13 @@ export class Node {
 export function start(node: Node) {
   node.startTime = new Date().getTime();
   const firstQuiz = getQuiz({ node, quizIndex: 0 });
-  node.quizs[0] = _startQuiz(firstQuiz);
-  node.state = State.WORKING;
-
+  // post can have 0 comment hence no quiz
+  if (undefined == firstQuiz) {
+    node = end(node);
+  } else {
+    node.quizs[0] = _startQuiz(firstQuiz);
+    node.state = State.WORKING;
+  }
   return node;
 }
 
@@ -79,6 +78,9 @@ export function checkQuiz({
 }) {
   // get quiz value
   const quiz = getQuiz({ node, quizIndex });
+  if (undefined == quiz) {
+    throw Error("quizIndex out of range");
+  }
   // update quiz value
   const { quiz: newQuiz } = checkAnswer(quiz, answer);
 
@@ -104,8 +106,7 @@ export function isLastQuiz({
   node: Node;
   quizIndex: number;
 }) {
-  console.log(node.quizs);
-  return node.quizs.length - 1 == quizIndex;
+  return node.quizs.length - 1 <= quizIndex;
 }
 
 export function startQuiz({
@@ -115,10 +116,9 @@ export function startQuiz({
   node: Node;
   quizIndex: number;
 }) {
-  let quiz = getQuiz({ node, quizIndex });
+  const quiz = getQuiz({ node, quizIndex });
   if (quiz == undefined) throw Error("quizIndex out of range ");
-  quiz = _startQuiz(quiz);
-  node.quizs[0] = quiz;
+  node.quizs[quizIndex] = _startQuiz(quiz);
 
   return node;
 }

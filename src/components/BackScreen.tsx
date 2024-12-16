@@ -12,7 +12,7 @@ export default function BackScreen({
   game: Game;
 }) {
   return (
-    <hstack width="100%" alignment="start top" padding="medium">
+    <hstack width="100%" alignment="start top" padding="small">
       <button
         icon="back-fill"
         appearance="plain"

@@ -1,19 +1,17 @@
 import { Devvit, ContextAPIClients, Dispatch } from "@devvit/public-api";
 import FillInTheBlank from "../components/FillInTheBlank.js";
 import {
-  Node,
   checkQuiz,
-  start as startNode,
   end as endNode,
   getQuiz,
   isLastQuiz,
 } from "../entities/Node.js";
 import { Screen } from "../entities/enums/Screen.js";
 import { QuizType } from "../entities/enums/QuizType.js";
-import { Quiz as QuizModel, start as startQuiz } from "../entities/Quiz.js";
+import { Quiz as QuizModel } from "../entities/Quiz.js";
 import MultipleChoice from "../components/MultipleChoice.js";
 import { Game } from "../main.js";
-import { isLastNode } from "../entities/Maze.js";
+import PostLink from "../components/PostLink.js";
 
 export default function Quiz({
   context,
@@ -28,8 +26,17 @@ export default function Quiz({
   const quizIndex = game.quizIndex;
   const maze = game.maze;
 
-  const node: Node = game.maze.nodes.at(nodeIndex);
+  const node = game.maze.nodes.at(nodeIndex);
+
+  if (undefined == node) {
+    throw Error("nodeIndex out of range");
+  }
+
   const quiz = getQuiz({ node, quizIndex });
+
+  if (undefined == quiz) {
+    throw Error("quizIndex out of range");
+  }
 
   function onAnswer(answer: string) {
     let newNode = checkQuiz({ node, quizIndex, answer });
@@ -45,13 +52,8 @@ export default function Quiz({
   }
 
   return (
-    <vstack
-      gap="medium"
-      alignment="middle center"
-      padding="medium"
-      width="100%"
-      height="100%"
-    >
+    <vstack gap="medium" width="100%" height="100%" padding="medium">
+      <PostLink url={node.url} context={context} />
       <Question context={context} quiz={quiz} onAnswer={onAnswer} />
     </vstack>
   );
