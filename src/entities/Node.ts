@@ -19,6 +19,7 @@ export class Node {
   public endTime: number = 0;
   public quizs: Quiz[] = [];
   public nextNodes: number[] = [];
+  public numberOfCorrectAnswer = 0;
 
   constructor(
     public level: Level,
@@ -62,8 +63,12 @@ export function end(node: Node) {
   for (const quiz of node.quizs) {
     node.completedPoint += quiz.completedPoint;
   }
-  calculatePointWithTime(node.rule, completedTime);
-  node.completedPoint += node.rule.maxCompletedPoint ?? 0;
+
+  if (node.numberOfCorrectAnswer === node.quizs.length) {
+    calculatePointWithTime(node.rule, completedTime)
+    node.completedPoint += node.rule.maxCompletedPoint ?? 0;
+
+  }
 
   return node;
 }
@@ -83,9 +88,13 @@ export function checkQuiz({
     throw Error("quizIndex out of range");
   }
   // update quiz value
-  const { quiz: newQuiz } = checkAnswer(quiz, answer);
+  const { quiz: newQuiz, result } = checkAnswer(quiz, answer);
 
   node.quizs[quizIndex] = newQuiz;
+
+  if (result) {
+    node.numberOfCorrectAnswer += 1;
+  }
 
   return node;
 }

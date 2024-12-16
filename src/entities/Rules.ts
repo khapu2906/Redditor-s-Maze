@@ -4,8 +4,8 @@ import { Level, DownLevelPoint, DownLevelWithTimeRate } from "./enums/Level"
 import { DownTimePointKey } from "./enums/Point"
 
 const MAX_COMPLETED_POINT_MAZE  = 400;
-const MAX_COMPLETED_POINT_NODE  = 100;
-const MAX_COMPLETED_POINT_QUIZ = 50;
+const MAX_COMPLETED_POINT_NODE  = 200;
+const MAX_COMPLETED_POINT_QUIZ = 100;
 
 
 const DownTimePoint = {
