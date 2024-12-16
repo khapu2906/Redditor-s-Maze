@@ -7,7 +7,7 @@ import { IExtendInfo } from "./entities/interfaces/IQuiz";
 import { User } from "./entities/User";
 import { State } from "./entities/enums/State";
 import { ContextAPIClients, Post } from "@devvit/public-api";
-import { bumpUp } from "./entities/Maze.js";
+import { bumpUp } from "./entities/Maze";
 
 const redditUsernames: Array<string> = [
   "FunnyToast42",
@@ -65,12 +65,71 @@ export class Service {
 
     const keyWord = `postPlay:${post.id}`;
 
+    const user = new User(this.context.userId, this.context.postId);
+    const maze: Maze = new Maze(this.context.postId, subreddit, level, user);
+    const posts: Array<any> = await this.context.reddit
+      .getHotPosts({
+        subredditName: subreddit,
+        timeframe: "day",
+        limit: LevelMaxNode[level],
+        pageSize: LevelMaxNode[level],
+      })
+      .all();
+
+    for (let i = 0; i < LevelMaxNode[level]; i++) {
+      if (!posts[i]) {
+        break;
+      }
+      const commentCount = LevelMaxNode[level] / 2;
+      const node = maze.createNode(posts[i].url);
+      const comments = await posts[i].comments.get(commentCount);
+
+      const quizSizeInNode = Math.floor(
+        (Math.random() * (commentCount - 1)) + 1,
+      );
+      let c = 0;
+      let extra = 0;
+      while (c < quizSizeInNode + extra && comments[c]) {
+        const info: IExtendInfo = {
+          content: comments[c].body.slice(0, 300),
+          author: comments[c].authorName,
+          url: comments[c].url,
+          noiseAuthor: [],
+        };
+
+        if (this._isGifUrl(comments[c].body)) {
+          c++;
+          extra++;
+          continue;
+        }
+        c++;
+
+        const typeQuizRandom = Math.floor(Math.random() * (2 - 1 + 1) + 1);
+
+        let typeQuiz;
+        switch (typeQuizRandom) {
+          case 1:
+            typeQuiz = QuizType.FILL_BLANK;
+            break;
+          default:
+            typeQuiz = QuizType.MULTIPLE_CHOICE;
+            info.noiseAuthor = this.__getRandomUsernames(redditUsernames);
+            break;
+        }
+
+        node.createQuiz(info, typeQuiz);
+      }
+    }
+
+    for (const node of maze.nodes) {
+      node.nextNodes = bumpUp(node, maze)
+    }
+
+    const mString = JSON.stringify(maze)
+
     const res = await this.context.redis.set(
       keyWord,
-      JSON.stringify({
-        kw: subreddit,
-        level,
-      }),
+      mString,
     );
 
     return post;
@@ -91,68 +150,8 @@ export class Service {
   async loadMaze(): Maze {
     try {
       const keyWord = `postPlay:${this.context.postId}`;
-      const mazeConfig = await this.context.redis.get(keyWord);
-      const { kw, level } = JSON.parse(mazeConfig);
-      // start maze
-      const user = new User(this.context.userId, this.context.postId);
-      const maze: Maze = new Maze(this.context.postId, kw, level, user);
-      const posts: Array<any> = await this.context.reddit
-        .getHotPosts({
-          subredditName: kw,
-          timeframe: "day",
-          limit: LevelMaxNode[level],
-          pageSize: LevelMaxNode[level],
-        })
-        .all();
-
-      for (let i = 0; i < LevelMaxNode[level]; i++) {
-        if (!posts[i]) {
-          break;
-        }
-        const commentCount = LevelMaxNode[level] / 2;
-        const node = maze.createNode(posts[i].url);
-        const comments = await posts[i].comments.get(commentCount);
-
-        const quizSizeInNode = Math.floor(
-          ( Math.random() * (commentCount - 1) ) + 1,
-        );
-        let c = 0;
-        let extra = 0;
-        while (c < quizSizeInNode + extra && comments[c]) {
-          const info: IExtendInfo = {
-            content: comments[c].body.slice(0, 300),
-            author: comments[c].authorName,
-            url: comments[c].url,
-            noiseAuthor: [],
-          };
-
-          if (this._isGifUrl(comments[c].body)) {
-            c++;
-            extra++;
-            continue;
-          }
-          c++;
-
-          const typeQuizRandom = Math.floor(Math.random() * (2 - 1 + 1) + 1);
-
-          let typeQuiz;
-          switch (typeQuizRandom) {
-            case 1:
-              typeQuiz = QuizType.FILL_BLANK;
-              break;
-            default:
-              typeQuiz = QuizType.MULTIPLE_CHOICE;
-              info.noiseAuthor = this.__getRandomUsernames(redditUsernames);
-              break;
-          }
-
-          node.createQuiz(info, typeQuiz);
-        }
-      }
-
-        for (const node of maze.nodes) {
-            node.nextNodes = bumpUp(node, maze) 
-        }
+      const mazeString: string = await this.context.redis.get(keyWord);
+      const maze = JSON.parse(mazeString);
 
       return maze;
     } catch (error) {
@@ -163,31 +162,44 @@ export class Service {
   public async saveUser(maze: Maze) {
     try {
       const keyWord = `postPlay:${this.context.postId}:${this.context.userId}`;
-
-      await this.context.redis.del(keyWord);
+      const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
+      const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
 
       if (maze.state === State.NOT_YET || maze.state === State.WORKING) {
         throw new Error("Game not done!!");
       }
 
-      const user = {
-        ...maze.user,
-        completedPoint: maze.completedPoint,
-      };
+      // Kiểm tra xem người dùng đã hoàn thành hay chưa
+      const existingUser = await this.context.redis.get(keyWord);
+      if (!existingUser) {
+        // Nếu chưa hoàn thành, tăng số người hoàn thành
+        await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
+      } else {
+        console.log(`User ${this.context.userId} already completed the game.`);
+      }
 
-      await this.context.redis.set(keyWord, JSON.stringify(user));
+      const userScore = await this.context.redis.zScore(
+          keyWordLeaderBoard,
+          this.context.userId,
+        )
 
-      // Leaderboard Keys
-      const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
-      const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
+      if (!userScore || maze.completedPoint > userScore) {
+        await this.context.redis.del(keyWord);
+        const user = {
+          ...maze.user,
+          completedPoint: maze.completedPoint,
+        };
 
-      await this.context.redis.zAdd(keyWordLeaderBoard, {
-        member: this.context.userId,
-        score: maze.completedPoint,
-      });
+        await this.context.redis.set(keyWord, JSON.stringify(user));
 
-      await this.context.redis.incrBy(keyWordLeaderBoardNumberOfFinisher, 1);
+        // Cập nhật leaderboard
+        await this.context.redis.zAdd(keyWordLeaderBoard, {
+          member: this.context.userId,
+          score: maze.completedPoint,
+        });
+      }
 
+      // Lấy vị trí của người chơi trong bảng xếp hạng
       const rank = parseInt(
         await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId),
       );
@@ -203,15 +215,14 @@ export class Service {
     }
   }
 
+
   public async getLeaderBoard() {
     try {
       const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 
-      const rank = parseInt(
-        await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId),
-      );
+      const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId)
 
-      if (rank === null) {
+      if (rank == undefined) {
         console.log("User not found in leaderboard.");
         return { rank: null, numberOfFinishers: 0, userScore: 0 };
       }
@@ -229,10 +240,13 @@ export class Service {
       );
 
       console.log(`User rank: ${rank + 1}, Score: ${userScore}`);
+
+      const topPlayer = await this.context.redis.zRange(keyWordLeaderBoard, -1, -1, { by: "rank"});
       return {
         rank: rank + 1,
         numberOfFinishers: numberOfFinishers,
         userScore: userScore,
+        topPlayer
       };
     } catch (error) {
       console.error(error);

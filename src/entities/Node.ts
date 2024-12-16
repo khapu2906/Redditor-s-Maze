@@ -20,12 +20,17 @@ export class Node {
   public quizs: Quiz[] = [];
   public nextNodes: number[] = [];
   public numberOfCorrectAnswer = 0;
+  public name: string = ''
 
   constructor(
     public level: Level,
     public url: string,
   ) {
     this.rule = new RuleNode(this.level);
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    this.name = characters[randomIndex];
   }
 
   createQuiz(info: IExtendInfo, type: QuizType = QuizType.FILL_BLANK): Quiz {

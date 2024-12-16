@@ -72,6 +72,7 @@ export function end(maze: Maze) {
   for (const node of maze.nodes) {
     maze.completedPoint += node.completedPoint;
   }
+
   calculatePointWithTime(maze.rule, completedTime);
   maze.completedPoint += maze.rule.maxCompletedPoint ?? 0;
 
