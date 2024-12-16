@@ -13,12 +13,12 @@ export class Maze {
   public startTime: number = 0;
   public endTime: number = 0;
   public nodes: Array<Node> = [];
+  public user: User | null;
 
   constructor(
     public id: string,
     public keywords: string,
     public level: Level,
-    public user: User,
   ) {
     this.rule = new RuleMaze(this.level);
   }

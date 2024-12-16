@@ -65,8 +65,6 @@ export class Service {
 
     const keyWord = `postPlay:${post.id}`;
 
-    const user = new User(this.context.userId, this.context.postId);
-    const maze: Maze = new Maze(this.context.postId, subreddit, level, user);
     const posts: Array<any> = await this.context.reddit
       .getHotPosts({
         subredditName: subreddit,
@@ -76,6 +74,7 @@ export class Service {
       })
       .all();
 
+    const maze: Maze = new Maze(this.context.postId, subreddit, level);
     for (let i = 0; i < LevelMaxNode[level]; i++) {
       if (!posts[i]) {
         break;
@@ -97,7 +96,7 @@ export class Service {
           noiseAuthor: [],
         };
 
-        if (this._isGifUrl(comments[c].body)) {
+        if (this._isInvalidCmt(comments[c].body)) {
           c++;
           extra++;
           continue;
@@ -150,9 +149,10 @@ export class Service {
   async loadMaze(): Maze {
     try {
       const keyWord = `postPlay:${this.context.postId}`;
+      const user = new User(this.context.userId, this.context.postId);
       const mazeString: string = await this.context.redis.get(keyWord);
       const maze = JSON.parse(mazeString);
-
+      maze.user = user
       return maze;
     } catch (error) {
       console.error(error);
@@ -277,8 +277,9 @@ export class Service {
     return selected;
   }
 
-  private _isGifUrl(url: string) {
-    const pattern = /!\[gif\]\(giphy\|.*?\)/;
-    return pattern.test(url);
+  private _isInvalidCmt(cmt: string) {
+    const patternGif = /!\[gif\]\(giphy\|.*?\)/;
+    const patternImg = /\[img\]\(emote\|.*?\)/;
+    return patternGif.test(cmt) || patternImg.test(cmt);
   }
 }
