@@ -73,7 +73,7 @@ function Question({
     case QuizType.FILL_BLANK:
       body = (
         <FillInTheBlank
-          question={quiz.questAgg.question.slice(0, 50)}
+          question={quiz.questAgg.question}
           context={context}
           onAnswer={onAnswer}
         />
@@ -82,7 +82,7 @@ function Question({
     default:
       body = (
         <MultipleChoice
-          question={quiz.questAgg.question.slice(0, 50)}
+          question={quiz.questAgg.question}
           options={quiz.questAgg.options}
           context={context}
           onAnswer={onAnswer}
