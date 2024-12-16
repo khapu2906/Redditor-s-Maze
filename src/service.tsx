@@ -120,7 +120,7 @@ export class Service {
         let extra = 0;
         while (c < quizSizeInNode + extra && comments[c]) {
           const info: IExtendInfo = {
-            content: comments[c].body,
+            content: comments[c].body.slice(0, 300),
             author: comments[c].authorName,
             url: comments[c].url,
             noiseAuthor: [],
