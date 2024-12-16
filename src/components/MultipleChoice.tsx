@@ -1,7 +1,6 @@
-import { Devvit, useState, useForm, IconName, ContextAPIClients } from "@devvit/public-api";
+import { Devvit, useState, IconName, ContextAPIClients } from "@devvit/public-api";
 
 export default function MultipleChoice({
-  context,
   onAnswer,
   question,
   options,
@@ -29,8 +28,6 @@ context: ContextAPIClients,
       <text>Multiple choice</text>
 
       <text width="70%" wrap={true}>{question}</text>
-
-      <spacer grow />
 
       <hstack width="100%" alignment="center">
           <Options options={options} answer={answer} setAnswer={setAnswer} />

@@ -1,4 +1,5 @@
 import {
+    BaseContext,
   ContextAPIClients,
   Devvit,
   Dispatch,
@@ -15,7 +16,7 @@ export default function End({
 }: {
   game: Game;
   setGame: Dispatch<Game>;
-  context: ContextAPIClients;
+  context: ContextAPIClients & BaseContext;
 }) {
   const { loading, error } = useAsync(async function () {
     const service = new Service(context);
@@ -47,7 +48,7 @@ export default function End({
 
   return (
     <vstack alignment="middle center" gap="medium" height="100%" width="100%">
-      <text>Finish! You score {game.maze?.completedPoint}</text>
+      <text size="xxlarge">Finish! You score {game.maze?.completedPoint}</text>
       <button icon="home-fill" appearance="primary" onPress={resetGame}>
         Home Screen
       </button>

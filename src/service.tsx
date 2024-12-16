@@ -1,5 +1,5 @@
 import { BaseContext, Devvit } from "@devvit/public-api";
-import { Maze } from "./entities/Maze";
+import { Maze } from "./entities/Maze.js";
 
 import { Level, LevelMaxNode } from "./entities/enums/Level";
 import { QuizType } from "./entities/enums/QuizType";
@@ -7,6 +7,7 @@ import { IExtendInfo } from "./entities/interfaces/IQuiz";
 import { User } from "./entities/User";
 import { State } from "./entities/enums/State";
 import { ContextAPIClients, Post } from "@devvit/public-api";
+import { bumpUp } from "./entities/Maze.js";
 
 const redditUsernames: Array<string> = [
   "FunnyToast42",
@@ -94,7 +95,7 @@ export class Service {
       const { kw, level } = JSON.parse(mazeConfig);
       // start maze
       const user = new User(this.context.userId, this.context.postId);
-      let maze = new Maze(this.context.postId, kw, level, user);
+      const maze: Maze = new Maze(this.context.postId, kw, level, user);
       const posts: Array<any> = await this.context.reddit
         .getHotPosts({
           subredditName: kw,
@@ -148,6 +149,10 @@ export class Service {
           node.createQuiz(info, typeQuiz);
         }
       }
+
+        for (const node of maze.nodes) {
+            node.nextNodes = bumpUp(node, maze) 
+        }
 
       return maze;
     } catch (error) {

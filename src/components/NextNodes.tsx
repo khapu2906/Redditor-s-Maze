@@ -1,23 +1,30 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
 import { Screen } from "../entities/enums/Screen.js";
 import { Game } from "../main.js";
-import { Node, start as startNode } from "../entities/Node.js";
+import { start as startNode } from "../entities/Node.js";
+import { bumpUp } from "../entities/Maze.js";
 
 export default function NextNodes({
   game,
-  nodeIndices,
   setGame,
 }: {
   game: Game;
-  nodeIndices: number[];
   setGame: Dispatch<Game>;
 }) {
+  const maze = game.maze;
+  const currentNode = maze!.nodes.at(game.nodeIndex);
+
+  if (undefined == currentNode) {
+    throw Error("nodeIndex out of range");
+  }
+
+  const nodeIndices = currentNode.nextNodes;
+
   function onSelect(index: number) {
-    const maze = game.maze;
-    let node = maze.nodes[index];
+    const node = maze!.nodes[index];
 
     if (0 == node.startTime) {
-      maze.nodes[index] = startNode(node);
+      maze!.nodes[index] = startNode(node);
     }
     const screen =
       0 != node.endTime || 0 == node.quizs.length

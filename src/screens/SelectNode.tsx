@@ -1,7 +1,5 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
 import {
-  bumpUp,
-  getNodeIndices,
   end as endMaze,
   isLastNode,
 } from "../entities/Maze.js";
@@ -18,19 +16,20 @@ export default function SelectNode({
 }) {
   const maze = game.maze;
   const nodeIndex = game.nodeIndex;
-  const node = maze.nodes.at(nodeIndex);
-  const nextIndices = getNodeIndices({ maze, nodes: bumpUp(node, maze) });
+  const node = maze!.nodes.at(nodeIndex);
 
-  let action = (
-    <NextNodes game={game} nodeIndices={nextIndices} setGame={setGame} />
-  );
+  if (node == undefined) {
+    throw Error("nodeIndex out of range");
+  }
 
-  if (isLastNode({ maze, node })) {
+  let action = <NextNodes game={game} setGame={setGame} />;
+
+  if (isLastNode({ maze: maze!, node})) {
     action = (
       <button
         appearance="primary"
         onPress={async () => {
-          game.maze = endMaze(maze);
+          game.maze = endMaze(maze!);
           game.screen = Screen.END;
           setGame(game);
         }}
@@ -41,7 +40,7 @@ export default function SelectNode({
   }
 
   let text =
-    node?.quizs.length == 0 ? "Node has no quiz!" : "Node Already Completed";
+    node.quizs.length == 0 ? "Node has no quiz!" : "Node Already Completed";
 
   return (
     <vstack height="100%" width="100%" alignment="middle center" gap="medium">

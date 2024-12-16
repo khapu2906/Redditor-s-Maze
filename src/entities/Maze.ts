@@ -42,16 +42,18 @@ export function start(maze: Maze) {
   return maze;
 }
 
-export function bumpUp(currentNode: Node, maze: Maze): Node[] {
+export function bumpUp(currentNode: Node, maze: Maze): number[] {
   if (currentNode.url == maze.nodes.at(-1).url) {
     return [];
   } else {
-    const others = maze.nodes.filter((item) => currentNode !== item);
+    const others = maze.nodes.filter((item) => currentNode.url != item.url);
     const shuffled = others.sort(() => 0.5 - Math.random());
-    const randomCount = Math.max(2, Math.floor(Math.random() * others.length));
-    const next = shuffled.slice(0, randomCount);
-
-    return next;
+      const urls = maze.nodes.map((node) => node.url);
+      const indices = shuffled
+          .map((node) => node.url)
+          .map((url) => urls.findIndex((item) => url == item)) 
+    const randomCount = Math.max(2, Math.floor(Math.random() * indices.length));
+    return indices.slice(0, randomCount);
   }
 }
 

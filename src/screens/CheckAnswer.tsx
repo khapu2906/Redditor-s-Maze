@@ -1,12 +1,7 @@
 import { Devvit, Dispatch } from "@devvit/public-api";
 import { getQuiz, startQuiz } from "../entities/Node.js";
 import Answer from "../components/Answer.js";
-import {
-  bumpUp,
-  getNodeIndices,
-  end as endMaze,
-  isLastNode,
-} from "../entities/Maze.js";
+import { end as endMaze, isLastNode } from "../entities/Maze.js";
 import { Screen } from "../entities/enums/Screen.js";
 import NextNodes from "../components/NextNodes.js";
 import { StateQuiz } from "../entities/enums/State.js";
@@ -22,7 +17,7 @@ export default function CheckAnswer({
   const nodeIndex = game.nodeIndex;
   const maze = game.maze;
   const quizIndex = game.quizIndex;
-  const node = maze.nodes.at(nodeIndex);
+  const node = maze!.nodes.at(nodeIndex);
 
   if (node == undefined) {
     throw Error("nodeIndex out of range");
@@ -39,7 +34,7 @@ export default function CheckAnswer({
       onPress={() => {
         // update next quiz
         const newQuizIndex = quizIndex + 1;
-        maze.nodes[nodeIndex] = startQuiz({ node, quizIndex: newQuizIndex });
+        maze!.nodes[nodeIndex] = startQuiz({ node, quizIndex: newQuizIndex });
         game.quizIndex = newQuizIndex;
         game.screen = Screen.QUIZ;
         setGame(game);
@@ -51,20 +46,16 @@ export default function CheckAnswer({
 
   // node is done
   if (0 != node.endTime) {
-    const nextIndices = getNodeIndices({ maze, nodes: bumpUp(node, maze) });
-
-    action = (
-      <NextNodes game={game} nodeIndices={nextIndices} setGame={setGame} />
-    );
+    action = <NextNodes game={game} setGame={setGame} />;
   }
 
   // reach the final node of the maze
-  if (isLastNode({ maze, node })) {
+  if (isLastNode({ maze: maze!, node })) {
     action = (
       <button
         appearance="primary"
         onPress={async () => {
-          game.maze = endMaze(maze);
+          game.maze = endMaze(maze!);
           game.screen = Screen.END;
           setGame(game);
         }}

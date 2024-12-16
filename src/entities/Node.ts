@@ -18,6 +18,7 @@ export class Node {
   public startTime: number = 0;
   public endTime: number = 0;
   public quizs: Quiz[] = [];
+  public nextNodes: number[] = [];
 
   constructor(
     public level: Level,
