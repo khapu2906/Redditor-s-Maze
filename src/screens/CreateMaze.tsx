@@ -1,7 +1,9 @@
 import {
+    BaseContext,
   ContextAPIClients,
   Devvit,
   Dispatch,
+    IconName,
   useForm,
   useState,
 } from "@devvit/public-api";
@@ -22,29 +24,13 @@ export default function CreateMaze({
   game,
   setGame,
 }: {
-  context: ContextAPIClients;
+  context: ContextAPIClients & BaseContext;
   game: Game;
   setGame: Dispatch<Game>;
 }) {
   const [subreddit, setSubreddit] = useState("");
   const [difficulty, setDifficulty] = useState(Level.EASY);
   const service = new Service(context);
-
-  const difficultyForm = useForm(
-    {
-      fields: [
-        {
-          type: "select",
-          name: "difficulty",
-          label: "Difficulty",
-          options: difficulties.map((obj) => {
-            return { label: obj.string, value: obj.value };
-          }),
-        },
-      ],
-    },
-    (values) => setDifficulty(values.difficulty),
-  );
 
   const keywordForm = useForm(
     {
@@ -77,10 +63,6 @@ export default function CreateMaze({
     context.ui.showForm(keywordForm);
   }
 
-  function showDifficultyForm() {
-    context.ui.showForm(difficultyForm);
-  }
-
   async function onCreate() {
     context.ui.showToast({ text: "Creating Maze...", appearance: "neutral" });
     try {
@@ -107,10 +89,6 @@ export default function CreateMaze({
       </button>
     );
 
-  const difficultyText = difficulties.find(
-    (obj) => obj.value == difficulty,
-  ).string;
-
   return (
     <vstack height="100%" width="100%" alignment="center">
       <BackScreen screen={Screen.START} game={game} setGame={setGame} />
@@ -122,13 +100,45 @@ export default function CreateMaze({
           <button icon="topic-programming" onPress={showKeywordsForm}></button>
         </hstack>
         <hstack alignment="middle" minWidth="200px">
-          <text>Difficulty: {difficultyText}</text>
-          <spacer size="medium" grow />
-          <button icon="caret-down" onPress={showDifficultyForm}></button>
+            <Options options={difficulties} difficulty={difficulty} setDifficulty={setDifficulty} />
         </hstack>
 
         {button}
       </vstack>
+    </vstack>
+  );
+}
+
+function Options({
+    options,
+    setDifficulty,
+    difficulty,
+}: {
+    options: {string: string, value: Level}[];
+    setDifficulty: Function;
+    difficulty: Level;
+}) {
+    const buttons = options.map(function (option) {
+        let icon : IconName = "radio-button-outline";
+        let appearance: Devvit.Blocks.ButtonAppearance = "plain";
+
+        if (difficulty == option.value) {
+            icon = "radio-button-fill";
+            appearance = "plain";
+        }
+        return (
+            <button minWidth="50px" 
+                icon={icon}
+                appearance={appearance}
+                onPress={() => setDifficulty(option.value)}
+            >
+                {option.string}
+            </button>
+    );
+  });
+  return (
+    <vstack minWidth="50px" gap="medium" alignment="start">
+      {buttons}
     </vstack>
   );
 }
