@@ -78,25 +78,6 @@ export function end(maze: Maze) {
   return maze;
 }
 
-export function getNodeIndices({
-  maze,
-  nodes,
-}: {
-  maze: Maze;
-  nodes: Node[];
-}): number[] {
-  const urls = maze.nodes.map((node) => node.url);
-    function getIndex(url: string) {
-        return urls.findIndex((value) => url == value);
-    }
-    const indices = nodes.map((node) => node.url).map(getIndex);
-    console.debug("entities/Maze.ts urls ", urls);
-    console.debug("entities/Maze.ts node ", nodes.map((node) => node.url));
-    console.debug("entities/Maze.ts indices ", indices);
-
-    return indices;
-}
-
 export function isLastNode({ maze, node }: { maze: Maze; node: Node }) {
   return node.url == maze.nodes.at(-1).url;
 }

@@ -56,7 +56,6 @@ Devvit.addCustomPostType({
       nodeIndex: 0,
     });
 
-    console.debug("main.tsx maze", game.maze);
     let currentScreen;
     switch (game.screen) {
       case Screen.SELECT_NODE:
