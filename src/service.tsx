@@ -255,7 +255,7 @@ export class Service {
         { by: "rank" },
       );
       return {
-        rank: rank + 1,
+        rank: numberOfFinishers - rank,
         numberOfFinishers: numberOfFinishers,
         userScore: userScore,
         topPlayer: topPlayer[0],
