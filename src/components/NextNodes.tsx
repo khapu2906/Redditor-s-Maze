@@ -38,7 +38,8 @@ export default function NextNodes({
   }
 
   const nextNodes = nodeIndices.map((index) => {
-    return <button onPress={() => onSelect(index)}>Node {index}</button>;
+    const node = maze.nodes.at(index);
+    return <button onPress={() => onSelect(index)}>Node {node.name}</button>;
   });
 
   return (

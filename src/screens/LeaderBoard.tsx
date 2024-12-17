@@ -41,19 +41,27 @@ export default function LeaderBoard({
     );
   }
 
-  let text = `You haven't complete this maze`;
-  if (data != null) {
-    if (data.rank != null || data.userScore != 0) {
-      text = `You rank #${data.rank} among ${data.numberOfFinishers} players`;
-    }
-  }
-    context.userId
-  return (
-    <vstack height="100%" width="100%" alignment="center">
-      <BackScreen screen={Screen.START} setGame={setGame} game={game} />
+    let userRecord = `You haven't complete this maze`;
+    let topPlayer = "No one has finished this Maze"
+    if (data != null) {
+        if (data.topPlayer != null)  {
+            topPlayer = `The rank #1 player has ${data.topPlayer.score} score`;
+        }
 
-      <vstack height="70%" width="100%" gap="medium" alignment="middle center">
-        <text size="xlarge">{text}</text>
+        if (data.rank != null || data.userScore != 0) {
+            userRecord = `You rank #${data.rank} with ${data.userScore} score among ${data.numberOfFinishers} players`;
+            topPlayer = `The rank #1 player has ${data.topPlayer.score - data.userScore} score more`;
+        }
+
+    }
+
+    return (
+        <vstack height="100%" width="100%" alignment="center">
+            <BackScreen screen={Screen.START} setGame={setGame} game={game} />
+
+            <vstack height="70%" width="100%" gap="medium" alignment="middle center">
+                <text size="xxlarge">{userRecord}</text>
+                <text size="large">{topPlayer}</text>
       </vstack>
     </vstack>
   );

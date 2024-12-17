@@ -83,9 +83,7 @@ export class Service {
       const node = maze.createNode(posts[i].url);
       const comments = await posts[i].comments.get(commentCount);
 
-      const quizSizeInNode = Math.floor(
-        (Math.random() * (commentCount - 1)) + 1,
-      );
+      const quizSizeInNode = Math.floor(Math.random() * (commentCount - 1) + 1);
       let c = 0;
       let extra = 0;
       while (c < quizSizeInNode + extra && comments[c]) {
@@ -121,15 +119,12 @@ export class Service {
     }
 
     for (const node of maze.nodes) {
-      node.nextNodes = bumpUp(node, maze)
+      node.nextNodes = bumpUp(node, maze);
     }
 
-    const mString = JSON.stringify(maze)
+    const mString = JSON.stringify(maze);
 
-    const res = await this.context.redis.set(
-      keyWord,
-      mString,
-    );
+    const res = await this.context.redis.set(keyWord, mString);
 
     return post;
   }
@@ -146,25 +141,23 @@ export class Service {
     );
   }
 
-    async isMazeExist() {
-        try {
-            const keyWord = `postPlay:${this.context.postId}`;
-            return undefined != await this.context.redis.get(keyWord);
-        } catch (error) {
-            console.error(error)
-            return false;
-        }
+  async isMazeExist() {
+    try {
+      const keyWord = `postPlay:${this.context.postId}`;
+      return undefined != (await this.context.redis.get(keyWord));
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    async loadMaze(): Maze {
-        try {
-            const keyWord = `postPlay:${this.context.postId}`;
-            const mazeConfig = await this.context.redis.get(keyWord);
-      const { kw, level } = JSON.parse(mazeConfig);
-      // start maze
+  }
+
+  async loadMaze() {
+    try {
+      const keyWord = `postPlay:${this.context.postId}`;
       const user = new User(this.context.userId, this.context.postId);
       const mazeString: string = await this.context.redis.get(keyWord);
       const maze = JSON.parse(mazeString);
-      maze.user = user
+      maze.user = user;
       return maze;
     } catch (error) {
       console.error(error);
@@ -191,9 +184,9 @@ export class Service {
       }
 
       const userScore = await this.context.redis.zScore(
-          keyWordLeaderBoard,
-          this.context.userId,
-        )
+        keyWordLeaderBoard,
+        this.context.userId,
+      );
 
       if (!userScore || maze.completedPoint > userScore) {
         await this.context.redis.del(keyWord);
@@ -227,16 +220,18 @@ export class Service {
     }
   }
 
-
   public async getLeaderBoard() {
     try {
       const keyWordLeaderBoard = `postPlay:${this.context.postId}:leaderboard`;
 
-      const rank = await this.context.redis.zRank(keyWordLeaderBoard, this.context.userId)
+      const rank = await this.context.redis.zRank(
+        keyWordLeaderBoard,
+        this.context.userId,
+      );
 
       if (rank == undefined) {
         console.log("User not found in leaderboard.");
-        return { rank: null, numberOfFinishers: 0, userScore: 0 };
+        return { rank: null, numberOfFinishers: 0, userScore: 0, topPlayer: null };
       }
       const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
       const numberOfFinishers = parseInt(
@@ -253,12 +248,17 @@ export class Service {
 
       console.log(`User rank: ${rank + 1}, Score: ${userScore}`);
 
-      const topPlayer = await this.context.redis.zRange(keyWordLeaderBoard, -1, -1, { by: "rank"});
+      const topPlayer = await this.context.redis.zRange(
+        keyWordLeaderBoard,
+        -1,
+        -1,
+        { by: "rank" },
+      );
       return {
         rank: rank + 1,
         numberOfFinishers: numberOfFinishers,
         userScore: userScore,
-        topPlayer
+        topPlayer: topPlayer[0],
       };
     } catch (error) {
       console.error(error);

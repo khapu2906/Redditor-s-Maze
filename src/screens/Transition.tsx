@@ -2,8 +2,8 @@ import {
   Devvit,
   useAsync,
   ContextAPIClients,
-    Dispatch,
-    BaseContext,
+  Dispatch,
+  BaseContext,
 } from "@devvit/public-api";
 import { Service } from "../service.js";
 import { Screen } from "../entities/enums/Screen.js";
@@ -31,7 +31,8 @@ export default function Transition({
 
   function onStart() {
     game.maze = startMaze(maze);
-    game.screen = Screen.QUIZ;
+    game.screen =
+      game.maze.nodes[0].quizs.length == 0 ? Screen.SELECT_NODE : Screen.QUIZ;
     setGame(game);
   }
 
