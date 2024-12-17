@@ -53,8 +53,19 @@ export class Service {
     level: Level;
   }): Promise<Post> {
     const currentSubreddit = await this.context.reddit.getCurrentSubreddit();
+      let difficultyString;
+      switch (level) {
+          case Level.MEDIUM:
+              difficultyString = "MEDIUM";
+              break;
+          case Level.HARD:
+              difficultyString = "Hard";
+              break;
+          default:
+              difficultyString = "Easy";
+    }
     const post = await this.context.reddit.submitPost({
-      title: "Rsmaze",
+      title: `Rsmaze-${subreddit}-${difficultyString}-${Date.now()}`,
       subredditName: currentSubreddit.name,
       preview: (
         <vstack height="100%" width="100%" alignment="middle center">
@@ -231,7 +242,12 @@ export class Service {
 
       if (rank == undefined) {
         console.log("User not found in leaderboard.");
-        return { rank: null, numberOfFinishers: 0, userScore: 0, topPlayer: null };
+        return {
+          rank: null,
+          numberOfFinishers: 0,
+          userScore: 0,
+          topPlayer: null,
+        };
       }
       const keyWordLeaderBoardNumberOfFinisher = `${keyWordLeaderBoard}:numberOfFinisher`;
       const numberOfFinishers = parseInt(
