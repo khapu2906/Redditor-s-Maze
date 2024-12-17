@@ -99,7 +99,7 @@ export default function CreateMaze({
           <spacer size="medium" grow />
           <button icon="topic-programming" onPress={showKeywordsForm}></button>
         </hstack>
-        <hstack alignment="middle" minWidth="200px">
+        <hstack alignment="center" minWidth="200px">
             <Options options={difficulties} difficulty={difficulty} setDifficulty={setDifficulty} />
         </hstack>
 

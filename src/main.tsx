@@ -25,7 +25,7 @@ Devvit.addMenuItem({
     const { reddit, ui } = context;
     const subreddit = await reddit.getCurrentSubreddit();
     await reddit.submitPost({
-      title: "My devvit post",
+      title: "Rsmaze",
       subredditName: subreddit.name,
       // The preview appears while the post loads
       preview: (
@@ -86,7 +86,7 @@ Devvit.addCustomPostType({
         currentScreen = <End context={context} game={game} setGame={setGame} />;
         break;
       default:
-        currentScreen = <Start game={game} setGame={setGame} />;
+        currentScreen = <Start context={context} game={game} setGame={setGame} />;
     }
 
     return (

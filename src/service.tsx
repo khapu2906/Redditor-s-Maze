@@ -146,9 +146,21 @@ export class Service {
     );
   }
 
-  async loadMaze(): Maze {
-    try {
-      const keyWord = `postPlay:${this.context.postId}`;
+    async isMazeExist() {
+        try {
+            const keyWord = `postPlay:${this.context.postId}`;
+            return undefined != await this.context.redis.get(keyWord);
+        } catch (error) {
+            console.error(error)
+            return false;
+        }
+    }
+    async loadMaze(): Maze {
+        try {
+            const keyWord = `postPlay:${this.context.postId}`;
+            const mazeConfig = await this.context.redis.get(keyWord);
+      const { kw, level } = JSON.parse(mazeConfig);
+      // start maze
       const user = new User(this.context.userId, this.context.postId);
       const mazeString: string = await this.context.redis.get(keyWord);
       const maze = JSON.parse(mazeString);
